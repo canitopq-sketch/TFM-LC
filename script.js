@@ -1,36 +1,4 @@
-const cabeceraSitio = document.querySelector(".site-header");
 const nodosImagenDinamica = document.querySelectorAll(".dynamic-image");
-
-const DESPLAZAMIENTO_PARA_COMPACTAR = 260;
-const DESPLAZAMIENTO_PARA_EXPANDIR = 40;
-
-let cabeceraCompacta = false;
-let animacionPendiente = false;
-
-window.addEventListener("scroll", () => {
-    if (!cabeceraSitio || animacionPendiente) {
-        return;
-    }
-
-    animacionPendiente = true;
-    window.requestAnimationFrame(() => {
-        const desplazamientoActual = window.scrollY;
-        let siguienteEstadoCompacto = cabeceraCompacta;
-
-        if (!cabeceraCompacta && desplazamientoActual > DESPLAZAMIENTO_PARA_COMPACTAR) {
-            siguienteEstadoCompacto = true;
-        } else if (cabeceraCompacta && desplazamientoActual < DESPLAZAMIENTO_PARA_EXPANDIR) {
-            siguienteEstadoCompacto = false;
-        }
-
-        if (siguienteEstadoCompacto !== cabeceraCompacta) {
-            cabeceraCompacta = siguienteEstadoCompacto;
-            cabeceraSitio.classList.toggle("is-compact", cabeceraCompacta);
-        }
-
-        animacionPendiente = false;
-    });
-}, { passive: true });
 
 hidratarImagenesDinamicas();
 

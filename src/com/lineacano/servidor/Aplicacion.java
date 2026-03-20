@@ -35,6 +35,7 @@ public final class Aplicacion {
         HttpServer servidor = HttpServer.create(new InetSocketAddress(configuracion.puerto()), 0);
         servidor.createContext("/api/salud", intercambio -> escribirJson(intercambio, 200, "{\"estado\":\"ok\"}"));
         servidor.createContext("/api/sesion/iniciar", new ControladorInicioSesion(servicioAutenticacion));
+        servidor.createContext("/api/sesion/validar", new ControladorValidacionSesion(servicioAutenticacion));
         servidor.createContext("/api/usuarios/registro", new ControladorRegistroUsuario(servicioAutenticacion));
         servidor.createContext("/api/admin/clientes-horeca", new ControladorAltaHoreca(servicioAutenticacion));
         servidor.createContext("/api/disponibilidad", new ControladorDisponibilidad(servicioReservas, servicioAutenticacion));
@@ -47,6 +48,33 @@ public final class Aplicacion {
 
         System.out.println("Servidor Linea Cano disponible en http://localhost:" + configuracion.puerto());
         System.out.println("Raiz de archivos estaticos: " + configuracion.raizWeb());
+    }
+
+    private static final class ControladorValidacionSesion implements HttpHandler {
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorValidacionSesion(ServicioAutenticacion servicioAutenticacion) {
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"GET".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Optional<UsuarioSesion> sesion = servicioAutenticacion.buscarPorToken(
+                    intercambio.getRequestHeaders().getFirst("X-Linea-Token")
+            );
+
+            if (sesion.isEmpty()) {
+                escribirJson(intercambio, 401, "{\"error\":\"La sesion no es valida o ha caducado.\"}");
+                return;
+            }
+
+            escribirJson(intercambio, 200, sesion.get().aJson());
+        }
     }
 
     private static final class ControladorInicioSesion implements HttpHandler {

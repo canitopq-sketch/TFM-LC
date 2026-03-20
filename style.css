@@ -64,70 +64,56 @@ img {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 0.72rem;
-    padding: 0.3rem 0.62rem;
+    gap: 0.95rem;
+    padding: 0.38rem 0.78rem;
     margin-top: 0.35rem;
     border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 1.45rem;
+    border-radius: 1.7rem;
     background:
-        radial-gradient(circle at left center, rgba(240, 215, 156, 0.14), transparent 20%),
-        linear-gradient(135deg, rgba(252, 249, 243, 0.9), rgba(242, 234, 216, 0.84));
+        radial-gradient(circle at 14% 50%, rgba(190, 141, 57, 0.16), transparent 18%),
+        radial-gradient(circle at 22% 50%, rgba(42, 76, 104, 0.1), transparent 14%),
+        linear-gradient(135deg, rgba(252, 249, 243, 0.94), rgba(241, 232, 212, 0.88));
     backdrop-filter: blur(18px);
-    box-shadow: 0 10px 22px rgba(32, 52, 74, 0.1);
+    box-shadow: 0 14px 28px rgba(32, 52, 74, 0.11);
     will-change: auto;
-    transition:
-        padding 240ms cubic-bezier(0.22, 1, 0.36, 1),
-        border-radius 240ms cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1),
-        background 240ms cubic-bezier(0.22, 1, 0.36, 1),
-        top 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.site-header.is-compact {
-    grid-template-columns: auto 1fr auto;
-    top: 0.08rem;
-    padding: 0.04rem 0.34rem;
-    border-radius: 0.72rem;
-    background:
-        radial-gradient(circle at left center, rgba(240, 215, 156, 0.1), transparent 14%),
-        linear-gradient(135deg, rgba(249, 244, 235, 0.78), rgba(236, 225, 204, 0.62));
-    box-shadow: 0 4px 8px rgba(32, 52, 74, 0.05);
 }
 
 .brand {
     display: inline-flex;
     align-items: center;
     position: relative;
-    padding: 0.08rem 0.18rem;
-    border-radius: 0.95rem;
+    padding: 0.18rem 0.48rem 0.18rem 0.32rem;
+    border-radius: 1.3rem;
     background:
-        radial-gradient(circle at center, rgba(247, 242, 232, 0.88), rgba(244, 236, 220, 0.5) 58%, rgba(244, 236, 220, 0) 84%);
-    border: 0;
-    box-shadow: none;
+        radial-gradient(circle at 20% 50%, rgba(255, 246, 229, 0.92), rgba(243, 234, 217, 0.72) 48%, rgba(243, 234, 217, 0.18) 78%),
+        linear-gradient(90deg, rgba(255, 251, 244, 0.52), rgba(243, 235, 220, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 10px 24px rgba(28, 46, 65, 0.08);
     overflow: visible;
     isolation: isolate;
-    transition:
-        padding 240ms cubic-bezier(0.22, 1, 0.36, 1),
-        background 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.site-header.is-compact .brand {
-    grid-column: 1;
-    justify-self: start;
-    margin-left: -0.05rem;
-    padding-left: 0.02rem;
+.brand::before {
+    content: "";
+    position: absolute;
+    inset: 0.1rem;
+    border-radius: 1.15rem;
     background:
-        radial-gradient(circle at center, rgba(244, 236, 220, 0.76), rgba(238, 227, 207, 0.3) 54%, rgba(238, 227, 207, 0) 82%);
+        linear-gradient(90deg, rgba(190, 141, 57, 0.08), rgba(42, 76, 104, 0.04) 52%, rgba(255, 255, 255, 0));
+    z-index: 0;
 }
 
 .brand::after {
     content: "";
     position: absolute;
-    inset: -0.18rem;
-    border-radius: 1.1rem;
+    inset: -0.32rem;
+    border-radius: 1.45rem;
     background:
-        radial-gradient(circle at center, rgba(247, 242, 232, 0.28), rgba(247, 242, 232, 0) 70%);
-    filter: blur(14px);
+        radial-gradient(circle at 26% 50%, rgba(190, 141, 57, 0.16), rgba(247, 242, 232, 0) 56%),
+        radial-gradient(circle at 38% 50%, rgba(42, 76, 104, 0.1), rgba(247, 242, 232, 0) 64%);
+    filter: blur(16px);
     z-index: 0;
 }
 
@@ -135,39 +121,23 @@ img {
     position: relative;
     z-index: 1;
     width: auto;
-    height: 4.7rem;
+    height: 5.35rem;
     object-fit: contain;
     mix-blend-mode: multiply;
-    filter: saturate(1.02) contrast(1) brightness(1.01);
-    -webkit-mask-image: radial-gradient(ellipse at center, #000 58%, rgba(0, 0, 0, 0.88) 72%, rgba(0, 0, 0, 0.32) 84%, transparent 96%);
-    mask-image: radial-gradient(ellipse at center, #000 58%, rgba(0, 0, 0, 0.88) 72%, rgba(0, 0, 0, 0.32) 84%, transparent 96%);
+    filter: saturate(1.04) contrast(1.02) brightness(1.02);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 62%, rgba(0, 0, 0, 0.9) 76%, rgba(0, 0, 0, 0.38) 88%, transparent 100%);
+    mask-image: radial-gradient(ellipse at center, #000 62%, rgba(0, 0, 0, 0.9) 76%, rgba(0, 0, 0, 0.38) 88%, transparent 100%);
     transform-origin: left center;
     backface-visibility: hidden;
     will-change: auto;
-    transition: height 240ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.site-header.is-compact .brand-logo {
-    height: 2.15rem;
 }
 
 .site-nav {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.8rem;
-}
-
-.site-header.is-compact .site-nav {
-    grid-column: 2;
-    justify-content: center;
-    align-items: center;
-    gap: 0.45rem;
-}
-
-.site-header.is-compact .site-nav a {
-    font-size: 0.55rem;
-    letter-spacing: 0.12em;
+    gap: 0.78rem;
+    padding-inline: 0.2rem;
 }
 
 .site-nav a,
@@ -185,7 +155,7 @@ img {
     position: relative;
     font-size: 0.63rem;
     font-weight: 800;
-    color: var(--navy-deep);
+    color: rgba(24, 52, 76, 0.8);
 }
 
 .site-nav a::after {
@@ -227,15 +197,7 @@ img {
         transform 180ms ease,
         box-shadow 180ms ease,
         background-color 180ms ease;
-}
-
-.site-header.is-compact .header-cta {
-    grid-column: 3;
     justify-self: end;
-    min-height: 1.6rem;
-    padding: 0.24rem 0.48rem;
-    font-size: 0.5rem;
-    box-shadow: 0 5px 10px rgba(152, 108, 41, 0.1);
 }
 
 .header-cta,
@@ -891,6 +853,11 @@ img {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.sitemap-grid-ganaderias {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.35rem;
+}
+
 .contact-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -936,9 +903,11 @@ img {
     color: var(--navy-deep);
 }
 
-.sitemap-card-bravo {
+.sitemap-card-bravo,
+.sitemap-card-iberico,
+.sitemap-card-buey {
     align-content: end;
-    min-height: 25rem;
+    min-height: 33rem;
     background-position: center;
     background-size: cover;
     background-color: #243626;
@@ -946,14 +915,18 @@ img {
     box-shadow: 0 20px 54px rgba(19, 29, 24, 0.22);
 }
 
-.sitemap-card-bravo::after {
+.sitemap-card-bravo::after,
+.sitemap-card-iberico::after,
+.sitemap-card-buey::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(17, 24, 18, 0.1), rgba(10, 15, 11, 0.72));
+    background: linear-gradient(180deg, rgba(17, 24, 18, 0.04), rgba(10, 15, 11, 0.78));
 }
 
-.sitemap-card-bravo::before {
+.sitemap-card-bravo::before,
+.sitemap-card-iberico::before,
+.sitemap-card-buey::before {
     content: "";
     position: absolute;
     inset: 1.1rem;
@@ -962,29 +935,57 @@ img {
     pointer-events: none;
 }
 
-.sitemap-card-bravo > * {
+.sitemap-card-bravo > *,
+.sitemap-card-iberico > *,
+.sitemap-card-buey > * {
     position: relative;
     z-index: 1;
 }
 
-.sitemap-card-bravo .role-kicker {
+.sitemap-card-bravo .role-kicker,
+.sitemap-card-iberico .role-kicker,
+.sitemap-card-buey .role-kicker {
     color: rgba(252, 245, 231, 0.88);
 }
 
 .sitemap-card-bravo h3,
 .sitemap-card-bravo p,
-.sitemap-card-bravo a {
+.sitemap-card-bravo a,
+.sitemap-card-iberico h3,
+.sitemap-card-iberico p,
+.sitemap-card-iberico a,
+.sitemap-card-buey h3,
+.sitemap-card-buey p,
+.sitemap-card-buey a {
     color: #f7f0e2;
     text-shadow: 0 1px 10px rgba(0, 0, 0, 0.26);
 }
 
-.sitemap-card-bravo p {
+.sitemap-card-bravo p,
+.sitemap-card-iberico p,
+.sitemap-card-buey p {
     max-width: 32rem;
     color: rgba(247, 240, 226, 0.86);
 }
 
-.sitemap-card-bravo a {
+.sitemap-card-bravo a,
+.sitemap-card-iberico a,
+.sitemap-card-buey a {
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.16);
+}
+
+.sitemap-grid-ganaderias .sitemap-card {
+    padding: 2.2rem;
+}
+
+.sitemap-grid-ganaderias .sitemap-card h3 {
+    font-size: clamp(2.15rem, 3vw, 3rem);
+    line-height: 0.96;
+}
+
+.sitemap-grid-ganaderias .sitemap-card p {
+    font-size: 1rem;
+    line-height: 1.78;
 }
 
 .thematic-grid {
@@ -1002,6 +1003,66 @@ img {
         rgba(255, 255, 255, 0.58);
     border: 1px solid rgba(42, 76, 104, 0.1);
     box-shadow: 0 16px 40px rgba(24, 41, 59, 0.08);
+}
+
+.product-lines {
+    margin-top: 2rem;
+    display: grid;
+    gap: 1.2rem;
+}
+
+.product-line-card {
+    position: relative;
+    min-height: 31rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    width: 100%;
+    padding: 2.2rem;
+    border-radius: 2.2rem;
+    overflow: hidden;
+    background-position: center;
+    background-size: cover;
+    background-color: #263325;
+    border: 1px solid rgba(245, 240, 230, 0.24);
+    box-shadow: 0 24px 60px rgba(19, 29, 24, 0.2);
+}
+
+.product-line-card::before {
+    content: "";
+    position: absolute;
+    inset: 1.2rem;
+    border-radius: 1.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    pointer-events: none;
+}
+
+.product-line-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.product-line-card .role-kicker {
+    color: rgba(250, 236, 196, 0.94);
+}
+
+.product-line-card h3 {
+    max-width: 48rem;
+    margin-top: 1rem;
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2.4rem, 4.2vw, 3.75rem);
+    line-height: 0.95;
+    color: #f8f1e5;
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.28);
+}
+
+.product-line-card p {
+    max-width: 42rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: rgba(248, 241, 229, 0.9);
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.22);
 }
 
 .thematic-card h3 {
@@ -1528,11 +1589,7 @@ img {
     }
 
     .brand-logo {
-        height: 4.6rem;
-    }
-
-    .site-header.is-compact .brand-logo {
-        height: 2.6rem;
+        height: 5rem;
     }
 
     .header-cta,

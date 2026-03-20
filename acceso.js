@@ -13,10 +13,7 @@ const campoRegistroContrasena = document.querySelector("#register-password");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
 
-const sesionGuardada = cargarSesion();
-if (sesionGuardada) {
-    redirigirSegunPerfil(sesionGuardada.rol);
-}
+inicializarSesionGuardada();
 
 formularioAcceso.addEventListener("submit", async (evento) => {
     evento.preventDefault();
@@ -126,6 +123,32 @@ function cargarSesion() {
         return valorGuardado ? JSON.parse(valorGuardado) : null;
     } catch {
         return null;
+    }
+}
+
+async function inicializarSesionGuardada() {
+    const sesionGuardada = cargarSesion();
+    if (!sesionGuardada?.token) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch("/api/sesion/validar", {
+            headers: {
+                "Accept": "application/json",
+                "X-Linea-Token": sesionGuardada.token
+            }
+        });
+
+        if (!respuesta.ok) {
+            throw new Error("La sesion ya no es valida.");
+        }
+
+        const datos = await respuesta.json();
+        localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(datos));
+        redirigirSegunPerfil(datos.rol);
+    } catch {
+        localStorage.removeItem(CLAVE_ALMACENAMIENTO);
     }
 }
 

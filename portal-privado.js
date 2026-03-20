@@ -1,4 +1,3 @@
-const cabeceraSitio = document.querySelector(".site-header");
 const botonCerrarSesion = document.querySelector("#logout-button");
 const formularioReserva = document.querySelector("#booking-form");
 const campoFechaEntrada = document.querySelector("#checkin");
@@ -15,17 +14,10 @@ const formularioHoreca = document.querySelector("#horeca-form");
 const estadoHoreca = document.querySelector("#horeca-status");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
-const DESPLAZAMIENTO_PARA_COMPACTAR = 260;
-const DESPLAZAMIENTO_PARA_EXPANDIR = 40;
-
 let sesionActiva = cargarSesion();
-let cabeceraCompacta = false;
-let animacionPendiente = false;
 let ultimaDisponibilidad = null;
 
-protegerPagina();
-configurarCabecera();
-configurarFechas();
+inicializarPortalPrivado();
 
 formularioReserva.addEventListener("submit", async (evento) => {
     evento.preventDefault();
@@ -44,6 +36,11 @@ formularioReserva.addEventListener("submit", async (evento) => {
                 }
             }
         );
+
+        if (respuesta.status === 401) {
+            cerrarSesionPorExpiracion();
+            return;
+        }
 
         const datos = await respuesta.json();
 
@@ -88,6 +85,11 @@ botonConfirmarReserva.addEventListener("click", async () => {
                 huespedes: Number(campoHuespedes.value)
             })
         });
+
+        if (respuesta.status === 401) {
+            cerrarSesionPorExpiracion();
+            return;
+        }
 
         const datos = await respuesta.json();
 
@@ -157,6 +159,11 @@ if (formularioHoreca) {
                 body: JSON.stringify(datosFormulario)
             });
 
+            if (respuesta.status === 401) {
+                cerrarSesionPorExpiracion();
+                return;
+            }
+
             const datos = await respuesta.json();
 
             if (!respuesta.ok) {
@@ -186,6 +193,24 @@ function cargarSesion() {
     } catch {
         return null;
     }
+}
+
+async function inicializarPortalPrivado() {
+    if (!sesionActiva?.token) {
+        window.location.href = "acceso.html";
+        return;
+    }
+
+    const sesionValidada = await validarSesionEnServidor(sesionActiva.token);
+    if (!sesionValidada) {
+        cerrarSesionPorExpiracion();
+        return;
+    }
+
+    sesionActiva = sesionValidada;
+    localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(sesionActiva));
+    protegerPagina();
+    configurarFechas();
 }
 
 function protegerPagina() {
@@ -237,31 +262,28 @@ function redirigirSegunPerfil(rol) {
     window.location.href = "acceso.html";
 }
 
-function configurarCabecera() {
-    window.addEventListener("scroll", () => {
-        if (!cabeceraSitio || animacionPendiente) {
-            return;
+async function validarSesionEnServidor(token) {
+    try {
+        const respuesta = await fetch("/api/sesion/validar", {
+            headers: {
+                "Accept": "application/json",
+                "X-Linea-Token": token
+            }
+        });
+
+        if (!respuesta.ok) {
+            return null;
         }
 
-        animacionPendiente = true;
-        window.requestAnimationFrame(() => {
-            const desplazamientoActual = window.scrollY;
-            let siguienteEstadoCompacto = cabeceraCompacta;
+        return await respuesta.json();
+    } catch {
+        return null;
+    }
+}
 
-            if (!cabeceraCompacta && desplazamientoActual > DESPLAZAMIENTO_PARA_COMPACTAR) {
-                siguienteEstadoCompacto = true;
-            } else if (cabeceraCompacta && desplazamientoActual < DESPLAZAMIENTO_PARA_EXPANDIR) {
-                siguienteEstadoCompacto = false;
-            }
-
-            if (siguienteEstadoCompacto !== cabeceraCompacta) {
-                cabeceraCompacta = siguienteEstadoCompacto;
-                cabeceraSitio.classList.toggle("is-compact", cabeceraCompacta);
-            }
-
-            animacionPendiente = false;
-        });
-    }, { passive: true });
+function cerrarSesionPorExpiracion() {
+    localStorage.removeItem(CLAVE_ALMACENAMIENTO);
+    window.location.href = "acceso.html";
 }
 
 function configurarFechas() {
