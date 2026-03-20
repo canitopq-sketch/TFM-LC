@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso | Linea Cano</title>
+    <meta name="description" content="Acceso y registro para clientes y equipo comercial de Linea Cano.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Volver al inicio">
+            <img class="brand-logo" src="Logo_LineaCano.jpg" alt="Logo de Linea Cano">
+        </a>
+
+        <nav class="site-nav" aria-label="Principal">
+            <a href="index.html#ganaderia">Ganaderia</a>
+            <a href="index.html#producto">Gastronomia</a>
+            <a href="index.html#hospitality">Hospitality</a>
+            <a href="index.html#compromiso">Compromiso</a>
+        </nav>
+
+        <a class="header-cta" href="index.html">Volver a la web</a>
+    </header>
+
+    <main class="private-shell">
+        <section class="section private-hero">
+            <div class="section-heading">
+                <p class="eyebrow">Acceso privado</p>
+                <h2>Accede a tu area privada o solicita registro para entrar en el ecosistema Linea Cano.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card private-card-dark">
+                    <span class="role-kicker">Acceso</span>
+                    <h3>Inicia sesion para entrar en tu frontal segun perfil.</h3>
+                    <p class="auth-copy">
+                        El cliente registrado entra en su panel de disponibilidad y reserva. El perfil comercial accede a un frontal
+                        especifico de seguimiento, consulta y operativa inicial.
+                    </p>
+
+                    <form class="auth-form" id="auth-form">
+                        <label>
+                            Correo de acceso
+                            <input id="auth-username" name="usuario" type="text" placeholder="cliente@lineacano.com" required>
+                        </label>
+                        <label>
+                            Contrasena
+                            <input
+                                id="auth-password"
+                                name="contrasena"
+                                type="password"
+                                placeholder="cliente123"
+                                maxlength="12"
+                                pattern="[A-Za-z0-9]{1,12}"
+                                title="La contraseña debe tener un máximo de 12 caracteres alfanuméricos."
+                                required
+                            >
+                        </label>
+                        <button class="button button-primary" type="submit">Entrar</button>
+                    </form>
+
+                    <div class="session-status" id="session-status" data-state="publico">
+                        <p class="availability-label">Estado de acceso</p>
+                        <strong class="availability-title">Esperando autenticacion</strong>
+                        <p class="availability-text">Introduce tus credenciales para redirigirte al frontal correspondiente.</p>
+                    </div>
+                </article>
+
+                <article class="private-card">
+                    <span class="role-kicker">Registro</span>
+                    <h3>Solicita alta segun el tipo de relacion que quieres iniciar con la finca.</h3>
+                    <p class="private-text">
+                        Este bloque prepara la captacion segmentada para turismo premium, HORECA y eventos. De momento funciona
+                        como frontal de solicitud para la siguiente iteracion del sistema.
+                    </p>
+
+                    <form class="register-form" id="register-form">
+                        <label>
+                            Nombre o empresa
+                            <input id="register-name" type="text" placeholder="Nombre completo o razon social" required>
+                        </label>
+                        <label>
+                            Correo
+                            <input id="register-email" type="email" placeholder="correo@ejemplo.com" required>
+                        </label>
+                        <label>
+                            Tipo de acceso
+                            <select id="register-type" required>
+                                <option value="turismo">Turismo premium</option>
+                                <option value="eventos">Eventos y celebraciones</option>
+                                <option value="horeca">Profesional HORECA</option>
+                            </select>
+                        </label>
+                        <button class="button button-secondary register-submit" type="submit">Solicitar registro</button>
+                    </form>
+
+                    <div class="availability-card" id="register-status" data-state="bloqueado">
+                        <p class="availability-label">Solicitud</p>
+                        <strong class="availability-title">Registro guiado</strong>
+                        <p class="availability-text">Deja tus datos para que el equipo comercial active el acceso adecuado.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script src="acceso.js"></script>
+</body>
+</html>

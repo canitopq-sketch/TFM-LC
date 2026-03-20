@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area comercial | Linea Cano</title>
+    <meta name="description" content="Panel comercial para seguimiento de disponibilidad y reservas de Linea Cano.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-private-page="comercial">
+    <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Inicio Linea Cano">
+            <img class="brand-logo" src="Logo_LineaCano.jpg" alt="Logo de Linea Cano">
+        </a>
+
+        <nav class="site-nav" aria-label="Navegacion privada">
+            <a href="#panel">Panel</a>
+            <a href="#reserva">Disponibilidad</a>
+            <a href="index.html">Web publica</a>
+        </nav>
+
+        <button class="header-cta private-logout" id="logout-button" type="button">Cerrar sesion</button>
+    </header>
+
+    <main class="private-shell" id="panel">
+        <section class="section private-hero">
+            <div class="section-heading">
+                <p class="eyebrow">Area comercial</p>
+                <h2 id="private-page-title">Consulta operativa, reservas y siguiente capa de gestion comercial.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card private-card-dark">
+                    <span class="role-kicker">Sesion activa</span>
+                    <h3 id="private-user-name">Perfil comercial</h3>
+                    <p class="auth-copy" id="private-user-copy">
+                        Este frontal prepara el salto a agenda, eventos, HORECA y seguimiento de oportunidades.
+                    </p>
+
+                    <div class="session-status" id="session-status" data-state="maestro">
+                        <p class="availability-label">Estado de acceso</p>
+                        <strong class="availability-title">Acceso comercial autorizado</strong>
+                        <p class="availability-text">La sesion comercial puede consultar ocupacion y confirmar reservas.</p>
+                    </div>
+                </article>
+
+                <article class="private-card">
+                    <span class="role-kicker">Negocio</span>
+                    <h3>Una base preparada para eventos, HORECA, turismo premium y seguimiento comercial.</h3>
+                    <div class="role-features">
+                        <article>
+                            <strong>Eventos de alto nivel</strong>
+                            <span>Salon de 350 pax, bodas, empresa y presupuestos personalizados.</span>
+                        </article>
+                        <article>
+                            <strong>Captacion segmentada</strong>
+                            <span>Turismo premium, profesional HORECA y experiencias ligadas a la dehesa.</span>
+                        </article>
+                        <article>
+                            <strong>Expansion futura</strong>
+                            <span>Base lista para CRM, calendario comercial, dossieres y cuadros de ocupacion.</span>
+                        </article>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section reserve-section" id="reserva">
+            <div class="reservation-layout">
+                <article class="reserve-card">
+                    <p class="eyebrow">Control inicial</p>
+                    <h2>El frontal comercial consulta disponibilidad y puede registrar reservas para validar el flujo completo.</h2>
+                    <p>
+                        Este entorno sirve como primera capa operativa para revisar ocupacion, confirmar una reserva y preparar
+                        futuras pantallas de gestion interna.
+                    </p>
+                </article>
+
+                <aside class="booking-widget">
+                    <div class="booking-head">
+                        <span class="role-kicker">Consulta</span>
+                        <h3>Disponibilidad y reserva</h3>
+                    </div>
+
+                    <form class="booking-form" id="booking-form">
+                        <label>
+                            Llegada
+                            <input id="checkin" name="checkin" type="date" required>
+                        </label>
+                        <label>
+                            Salida
+                            <input id="checkout" name="checkout" type="date" required>
+                        </label>
+                        <label>
+                            Huespedes
+                            <select id="guests" name="guests">
+                                <option value="2">2 huespedes</option>
+                                <option value="4">4 huespedes</option>
+                                <option value="6">6 huespedes</option>
+                                <option value="8">8 huespedes</option>
+                            </select>
+                        </label>
+                        <button class="button button-primary booking-submit" type="submit">Consultar disponibilidad</button>
+                        <button class="button button-secondary booking-submit booking-confirm is-hidden" id="booking-confirm" type="button">Confirmar reserva</button>
+                    </form>
+
+                    <div class="availability-card" id="availability-card" aria-live="polite">
+                        <p class="availability-label">Estado actual</p>
+                        <strong class="availability-title">Area comercial lista</strong>
+                        <p class="availability-text">Selecciona fechas para consultar ocupacion real y avanzar con la reserva.</p>
+                    </div>
+
+                    <div class="management-preview" id="booking-summary">
+                        <article>
+                            <span>Habitaciones libres</span>
+                            <strong>Sin consulta</strong>
+                        </article>
+                        <article>
+                            <span>Habitaciones ocupadas</span>
+                            <strong>Sin consulta</strong>
+                        </article>
+                        <article>
+                            <span>Total inventario</span>
+                            <strong>Sin consulta</strong>
+                        </article>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <script src="portal-privado.js"></script>
+</body>
+</html>

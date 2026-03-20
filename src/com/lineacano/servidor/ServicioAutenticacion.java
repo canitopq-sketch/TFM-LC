@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public final class ServicioAutenticacion {
     private static final String SQL_INICIO_SESION = """
-            SELECT ua.correo, ua.hash_contrasena, ua.rol, ua.activo, ua.id_dni, c.nombre, c.apellido1
+            SELECT ua.correo, ua.contrasena_hash, ua.rol, ua.activo, ua.id_dni, c.nombre, c.apellido1
             FROM usuario_acceso ua
             LEFT JOIN cliente c ON c.id_dni = ua.id_dni
             WHERE ua.correo = ?
@@ -29,6 +29,10 @@ public final class ServicioAutenticacion {
             throw new IllegalArgumentException("Usuario y contraseña son obligatorios.");
         }
 
+        if (!contrasena.matches("[A-Za-z0-9]{1,12}")) {
+            throw new IllegalArgumentException("La contraseña debe tener un maximo de 12 caracteres alfanumericos.");
+        }
+
         // Se normaliza el correo para evitar diferencias por mayúsculas o espacios.
         String correoNormalizado = usuario.trim().toLowerCase();
         String hashContrasena = Contrasenas.sha256(contrasena);
@@ -38,7 +42,7 @@ public final class ServicioAutenticacion {
 
             try (ResultSet resultados = sentencia.executeQuery()) {
                 if (!resultados.next()) {
-                    throw new IllegalArgumentException("Credenciales incorrectas.");
+                    throw new IllegalArgumentException("Usuario o contraseña incorrectos.");
                 }
 
                 boolean activo = resultados.getBoolean("activo");
@@ -46,9 +50,9 @@ public final class ServicioAutenticacion {
                     throw new IllegalArgumentException("El usuario no esta activo.");
                 }
 
-                String hashEsperado = resultados.getString("hash_contrasena");
+                String hashEsperado = resultados.getString("contrasena_hash");
                 if (!hashContrasena.equalsIgnoreCase(hashEsperado)) {
-                    throw new IllegalArgumentException("Credenciales incorrectas.");
+                    throw new IllegalArgumentException("Usuario o contraseña incorrectos.");
                 }
 
                 String nombreVisible = construirNombreVisible(
@@ -57,12 +61,14 @@ public final class ServicioAutenticacion {
                         correoNormalizado
                 );
 
+                String rolNormalizado = normalizarRol(resultados.getString("rol"));
+
                 // La sesión se guarda en memoria porque el objetivo actual es un prototipo funcional.
                 UsuarioSesion sesion = new UsuarioSesion(
                         UUID.randomUUID().toString(),
                         correoNormalizado,
                         nombreVisible,
-                        resultados.getString("rol"),
+                        rolNormalizado,
                         resultados.getString("id_dni"),
                         Instant.now()
                 );
@@ -92,5 +98,17 @@ public final class ServicioAutenticacion {
     private String construirNombreVisible(String nombre, String apellido1, String valorPorDefecto) {
         String nombreCompuesto = ((nombre == null ? "" : nombre.trim()) + " " + (apellido1 == null ? "" : apellido1.trim())).trim();
         return nombreCompuesto.isBlank() ? valorPorDefecto : nombreCompuesto;
+    }
+
+    private String normalizarRol(String rolBruto) {
+        if (rolBruto == null) {
+            return "publico";
+        }
+
+        return switch (rolBruto.trim().toLowerCase()) {
+            case "member", "registrado" -> "registrado";
+            case "master", "maestro", "comercial" -> "maestro";
+            default -> rolBruto.trim().toLowerCase();
+        };
     }
 }

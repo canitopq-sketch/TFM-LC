@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area cliente | Linea Cano</title>
+    <meta name="description" content="Panel de cliente registrado para disponibilidad y reservas de Linea Cano.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-private-page="cliente">
+    <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Inicio Linea Cano">
+            <img class="brand-logo" src="Logo_LineaCano.jpg" alt="Logo de Linea Cano">
+        </a>
+
+        <nav class="site-nav" aria-label="Navegacion privada">
+            <a href="#panel">Panel</a>
+            <a href="#reserva">Reserva</a>
+            <a href="index.html">Web publica</a>
+        </nav>
+
+        <button class="header-cta private-logout" id="logout-button" type="button">Cerrar sesion</button>
+    </header>
+
+    <main class="private-shell" id="panel">
+        <section class="section private-hero">
+            <div class="section-heading">
+                <p class="eyebrow">Area cliente</p>
+                <h2 id="private-page-title">Tu estancia empieza aqui: disponibilidad real, reserva y siguientes servicios.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card private-card-dark">
+                    <span class="role-kicker">Sesion activa</span>
+                    <h3 id="private-user-name">Cliente registrado</h3>
+                    <p class="auth-copy" id="private-user-copy">
+                        Desde este frontal puedes consultar el inventario real y confirmar tu reserva en la finca.
+                    </p>
+
+                    <div class="session-status" id="session-status" data-state="registrado">
+                        <p class="availability-label">Estado de acceso</p>
+                        <strong class="availability-title">Acceso autorizado</strong>
+                        <p class="availability-text">La sesion del cliente esta lista para operar con disponibilidad real.</p>
+                    </div>
+                </article>
+
+                <article class="private-card">
+                    <span class="role-kicker">Experiencia</span>
+                    <h3>Servicios y estancias preparados para una reserva personalizada.</h3>
+                    <div class="role-features">
+                        <article>
+                            <strong>Hotel boutique</strong>
+                            <span>Suites, entorno natural, descanso, privacidad y contacto directo con la dehesa.</span>
+                        </article>
+                        <article>
+                            <strong>Gastronomia km 0</strong>
+                            <span>Vacuno limusin, iberico, huerta eco y experiencias de mesa vinculadas al territorio.</span>
+                        </article>
+                        <article>
+                            <strong>Experiencia 365</strong>
+                            <span>Piscinas climatizadas sostenibles, bienestar rural y escapadas de autor durante todo el ano.</span>
+                        </article>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section reserve-section" id="reserva">
+            <div class="reservation-layout">
+                <article class="reserve-card">
+                    <p class="eyebrow">Reserva</p>
+                    <h2>Consulta fechas reales y confirma tu estancia desde el frontal de cliente.</h2>
+                    <p>
+                        Este panel conecta con la base de datos del proyecto para mostrar la disponibilidad real y registrar
+                        una reserva funcional sobre el sistema.
+                    </p>
+                </article>
+
+                <aside class="booking-widget">
+                    <div class="booking-head">
+                        <span class="role-kicker">Disponibilidad</span>
+                        <h3>Motor de reserva</h3>
+                    </div>
+
+                    <form class="booking-form" id="booking-form">
+                        <label>
+                            Llegada
+                            <input id="checkin" name="checkin" type="date" required>
+                        </label>
+                        <label>
+                            Salida
+                            <input id="checkout" name="checkout" type="date" required>
+                        </label>
+                        <label>
+                            Huespedes
+                            <select id="guests" name="guests">
+                                <option value="2">2 huespedes</option>
+                                <option value="4">4 huespedes</option>
+                                <option value="6">6 huespedes</option>
+                                <option value="8">8 huespedes</option>
+                            </select>
+                        </label>
+                        <button class="button button-primary booking-submit" type="submit">Consultar disponibilidad</button>
+                        <button class="button button-secondary booking-submit booking-confirm is-hidden" id="booking-confirm" type="button">Confirmar reserva</button>
+                    </form>
+
+                    <div class="availability-card" id="availability-card" aria-live="polite">
+                        <p class="availability-label">Estado actual</p>
+                        <strong class="availability-title">Zona privada lista</strong>
+                        <p class="availability-text">Selecciona fechas para consultar la disponibilidad real.</p>
+                    </div>
+
+                    <div class="management-preview" id="booking-summary">
+                        <article>
+                            <span>Habitaciones libres</span>
+                            <strong>Sin consulta</strong>
+                        </article>
+                        <article>
+                            <span>Habitaciones ocupadas</span>
+                            <strong>Sin consulta</strong>
+                        </article>
+                        <article>
+                            <span>Total inventario</span>
+                            <strong>Sin consulta</strong>
+                        </article>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <script src="portal-privado.js"></script>
+</body>
+</html>
