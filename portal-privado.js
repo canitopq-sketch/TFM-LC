@@ -11,6 +11,8 @@ const estadoSesion = document.querySelector("#session-status");
 const tituloPrivado = document.querySelector("#private-page-title");
 const nombrePrivado = document.querySelector("#private-user-name");
 const textoPrivado = document.querySelector("#private-user-copy");
+const formularioHoreca = document.querySelector("#horeca-form");
+const estadoHoreca = document.querySelector("#horeca-status");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
 const DESPLAZAMIENTO_PARA_COMPACTAR = 260;
@@ -119,6 +121,64 @@ botonCerrarSesion.addEventListener("click", () => {
     window.location.href = "acceso.html";
 });
 
+if (formularioHoreca) {
+    formularioHoreca.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+
+        const datosFormulario = {
+            empresa: document.querySelector("#horeca-company").value.trim(),
+            cif: document.querySelector("#horeca-cif").value.trim(),
+            nombreContacto: document.querySelector("#horeca-name").value.trim(),
+            apellidoContacto: document.querySelector("#horeca-surname").value.trim(),
+            documento: document.querySelector("#horeca-document").value.trim(),
+            correo: document.querySelector("#horeca-email").value.trim(),
+            telefono: document.querySelector("#horeca-phone").value.trim(),
+            contrasena: document.querySelector("#horeca-password").value.trim()
+        };
+
+        if (!/^[A-Za-z0-9]{1,12}$/.test(datosFormulario.contrasena)) {
+            renderizarEstadoHoreca(
+                "aviso",
+                "Contrasena no valida",
+                "La contrasena inicial debe tener un maximo de 12 caracteres alfanumericos."
+            );
+            document.querySelector("#horeca-password").focus();
+            return;
+        }
+
+        try {
+            const respuesta = await fetch("/api/admin/clientes-horeca", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-Linea-Token": sesionActiva.token
+                },
+                body: JSON.stringify(datosFormulario)
+            });
+
+            const datos = await respuesta.json();
+
+            if (!respuesta.ok) {
+                throw new Error(datos.error || "No se pudo crear el cliente HORECA.");
+            }
+
+            renderizarEstadoHoreca(
+                "disponible",
+                datos.titulo || "Alta realizada",
+                `${datos.mensaje} Correo de acceso: ${datos.correo}.`
+            );
+            formularioHoreca.reset();
+        } catch (error) {
+            renderizarEstadoHoreca(
+                "aviso",
+                "Alta no completada",
+                error.message || "No se ha podido registrar el cliente HORECA."
+            );
+        }
+    });
+}
+
 function cargarSesion() {
     try {
         const valorGuardado = localStorage.getItem(CLAVE_ALMACENAMIENTO);
@@ -136,7 +196,7 @@ function protegerPagina() {
         return;
     }
 
-    if (tipoPagina === "cliente" && sesionActiva.rol !== "registrado") {
+    if (tipoPagina === "cliente" && sesionActiva.rol !== "registrado" && sesionActiva.rol !== "horeca") {
         redirigirSegunPerfil(sesionActiva.rol);
         return;
     }
@@ -152,6 +212,10 @@ function protegerPagina() {
         tituloPrivado.textContent = "Frontal comercial con disponibilidad real, reserva y base para gestion futura.";
         textoPrivado.textContent = "Desde este entorno comercial puedes validar ocupacion, confirmar reservas y preparar la siguiente capa de operativa.";
         estadoSesion.dataset.state = "maestro";
+    } else if (sesionActiva.rol === "horeca") {
+        tituloPrivado.textContent = "Frontal profesional HORECA con acceso inicial a disponibilidad y futura capa comercial.";
+        textoPrivado.textContent = "Este acceso profesional queda preparado para tarifas, catalogo premium, seguimiento de pedidos y operativa comercial.";
+        estadoSesion.dataset.state = "horeca";
     } else {
         tituloPrivado.textContent = "Frontal de cliente con acceso a disponibilidad real y confirmacion de reserva.";
         textoPrivado.textContent = "Este entorno privado esta pensado para preparar la estancia y confirmar fechas directamente sobre el sistema.";
@@ -165,7 +229,7 @@ function redirigirSegunPerfil(rol) {
         return;
     }
 
-    if (rol === "registrado") {
+    if (rol === "registrado" || rol === "horeca") {
         window.location.href = "cliente.html";
         return;
     }
@@ -277,4 +341,17 @@ function formatearImporte(valor) {
         style: "currency",
         currency: "EUR"
     }).format(valor);
+}
+
+function renderizarEstadoHoreca(estado, titulo, texto) {
+    if (!estadoHoreca) {
+        return;
+    }
+
+    estadoHoreca.dataset.state = estado;
+    estadoHoreca.innerHTML = `
+        <p class="availability-label">Cliente HORECA</p>
+        <strong class="availability-title">${titulo}</strong>
+        <p class="availability-text">${texto}</p>
+    `;
 }

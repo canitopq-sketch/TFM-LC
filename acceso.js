@@ -4,6 +4,12 @@ const campoContrasena = document.querySelector("#auth-password");
 const estadoSesion = document.querySelector("#session-status");
 const formularioRegistro = document.querySelector("#register-form");
 const estadoRegistro = document.querySelector("#register-status");
+const campoRegistroDocumento = document.querySelector("#register-document");
+const campoRegistroNombre = document.querySelector("#register-name");
+const campoRegistroApellido = document.querySelector("#register-surname");
+const campoRegistroCorreo = document.querySelector("#register-email");
+const campoRegistroTelefono = document.querySelector("#register-phone");
+const campoRegistroContrasena = document.querySelector("#register-password");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
 
@@ -60,21 +66,58 @@ formularioAcceso.addEventListener("submit", async (evento) => {
     }
 });
 
-formularioRegistro.addEventListener("submit", (evento) => {
+formularioRegistro.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
-    const nombre = document.querySelector("#register-name").value.trim();
-    const correo = document.querySelector("#register-email").value.trim();
-    const tipo = document.querySelector("#register-type").value;
+    const contrasena = campoRegistroContrasena.value.trim();
+    const contrasenaValida = /^[A-Za-z0-9]{1,12}$/.test(contrasena);
 
-    estadoRegistro.dataset.state = "disponible";
-    estadoRegistro.innerHTML = `
-        <p class="availability-label">Solicitud</p>
-        <strong class="availability-title">Registro preparado</strong>
-        <p class="availability-text">Solicitud registrada para ${nombre || correo} en la linea ${tipo}. Este frontal ya queda listo para conectarse a captacion real.</p>
-    `;
+    if (!contrasenaValida) {
+        renderizarEstadoRegistro(
+            "aviso",
+            "Contrasena no valida",
+            "La contrasena debe tener un maximo de 12 caracteres alfanumericos."
+        );
+        campoRegistroContrasena.focus();
+        return;
+    }
 
-    formularioRegistro.reset();
+    try {
+        const respuesta = await fetch("/api/usuarios/registro", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                documento: campoRegistroDocumento.value.trim(),
+                nombre: campoRegistroNombre.value.trim(),
+                apellido: campoRegistroApellido.value.trim(),
+                correo: campoRegistroCorreo.value.trim(),
+                telefono: campoRegistroTelefono.value.trim(),
+                contrasena
+            })
+        });
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(datos.error || "No se pudo completar el registro.");
+        }
+
+        renderizarEstadoRegistro(
+            "disponible",
+            datos.titulo || "Registro completado",
+            `${datos.mensaje} Ya puedes iniciar sesion con tu correo y contrasena.`
+        );
+        formularioRegistro.reset();
+    } catch (error) {
+        renderizarEstadoRegistro(
+            "aviso",
+            "No se pudo crear la cuenta",
+            error.message || "Revisa los datos y vuelve a intentarlo."
+        );
+    }
 });
 
 function cargarSesion() {
@@ -101,10 +144,19 @@ function redirigirSegunPerfil(rol) {
         return;
     }
 
-    if (rol === "registrado") {
+    if (rol === "registrado" || rol === "horeca") {
         window.location.href = "cliente.html";
         return;
     }
 
     window.location.href = "index.html";
+}
+
+function renderizarEstadoRegistro(estado, titulo, texto) {
+    estadoRegistro.dataset.state = estado;
+    estadoRegistro.innerHTML = `
+        <p class="availability-label">Registro</p>
+        <strong class="availability-title">${titulo}</strong>
+        <p class="availability-text">${texto}</p>
+    `;
 }

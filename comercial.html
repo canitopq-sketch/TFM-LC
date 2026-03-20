@@ -130,6 +130,83 @@
                 </aside>
             </div>
         </section>
+
+        <section class="section">
+            <div class="section-heading">
+                <p class="eyebrow">Administracion</p>
+                <h2>Alta manual de clientes HORECA para activar acceso profesional desde el panel maestro.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card">
+                    <span class="role-kicker">Alta HORECA</span>
+                    <h3>Crea cuentas profesionales para restaurantes, hoteles y distribuidores de confianza.</h3>
+                    <p class="private-text">
+                        Este formulario da de alta el contacto principal, genera sus credenciales y lo vincula a una ficha
+                        profesional HORECA dentro de la base de datos.
+                    </p>
+
+                    <form class="register-form" id="horeca-form">
+                        <label>
+                            Empresa
+                            <input id="horeca-company" type="text" placeholder="Nombre de la empresa" required>
+                        </label>
+                        <label>
+                            CIF
+                            <input id="horeca-cif" type="text" placeholder="B12345678" maxlength="20" required>
+                        </label>
+                        <label>
+                            Nombre de contacto
+                            <input id="horeca-name" type="text" placeholder="Nombre" required>
+                        </label>
+                        <label>
+                            Primer apellido
+                            <input id="horeca-surname" type="text" placeholder="Primer apellido" required>
+                        </label>
+                        <label>
+                            DNI del contacto
+                            <input id="horeca-document" type="text" placeholder="12345678A" maxlength="20" required>
+                        </label>
+                        <label>
+                            Correo profesional
+                            <input id="horeca-email" type="email" placeholder="compras@empresa.com" required>
+                        </label>
+                        <label>
+                            Telefono
+                            <input id="horeca-phone" type="tel" placeholder="+34 600 000 000">
+                        </label>
+                        <label>
+                            Contrasena inicial
+                            <input
+                                id="horeca-password"
+                                type="password"
+                                placeholder="Maximo 12 caracteres"
+                                maxlength="12"
+                                pattern="[A-Za-z0-9]{1,12}"
+                                title="La contraseña debe tener un máximo de 12 caracteres alfanuméricos."
+                                required
+                            >
+                        </label>
+                        <button class="button button-primary booking-submit" type="submit">Dar de alta cliente HORECA</button>
+                    </form>
+                </article>
+
+                <article class="private-card">
+                    <span class="role-kicker">Estado</span>
+                    <h3>Seguimiento del alta profesional desde el frontal de administracion.</h3>
+                    <p class="private-text">
+                        Al completar el alta, el sistema genera un usuario con rol HORECA y deja el acceso listo para su
+                        siguiente evolucion funcional.
+                    </p>
+
+                    <div class="availability-card" id="horeca-status" data-state="bloqueado">
+                        <p class="availability-label">Cliente HORECA</p>
+                        <strong class="availability-title">Esperando datos de alta</strong>
+                        <p class="availability-text">Introduce los datos del profesional para crear su acceso desde el panel maestro.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
     </main>
 
     <script src="portal-privado.js"></script>

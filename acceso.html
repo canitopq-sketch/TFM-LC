@@ -72,36 +72,52 @@
 
                 <article class="private-card">
                     <span class="role-kicker">Registro</span>
-                    <h3>Solicita alta segun el tipo de relacion que quieres iniciar con la finca.</h3>
+                    <h3>Crea tu cuenta de cliente para consultar disponibilidad y reservar directamente.</h3>
                     <p class="private-text">
-                        Este bloque prepara la captacion segmentada para turismo premium, HORECA y eventos. De momento funciona
-                        como frontal de solicitud para la siguiente iteracion del sistema.
+                        Este formulario da de alta nuevos usuarios registrados dentro del sistema. El alta profesional HORECA
+                        queda reservada al panel de administracion para mantener el acceso segmentado.
                     </p>
 
                     <form class="register-form" id="register-form">
                         <label>
-                            Nombre o empresa
-                            <input id="register-name" type="text" placeholder="Nombre completo o razon social" required>
+                            DNI o documento
+                            <input id="register-document" type="text" placeholder="12345678A" maxlength="20" required>
+                        </label>
+                        <label>
+                            Nombre
+                            <input id="register-name" type="text" placeholder="Nombre" required>
+                        </label>
+                        <label>
+                            Primer apellido
+                            <input id="register-surname" type="text" placeholder="Primer apellido" required>
                         </label>
                         <label>
                             Correo
                             <input id="register-email" type="email" placeholder="correo@ejemplo.com" required>
                         </label>
                         <label>
-                            Tipo de acceso
-                            <select id="register-type" required>
-                                <option value="turismo">Turismo premium</option>
-                                <option value="eventos">Eventos y celebraciones</option>
-                                <option value="horeca">Profesional HORECA</option>
-                            </select>
+                            Telefono
+                            <input id="register-phone" type="tel" placeholder="+34 600 000 000">
                         </label>
-                        <button class="button button-secondary register-submit" type="submit">Solicitar registro</button>
+                        <label>
+                            Contrasena
+                            <input
+                                id="register-password"
+                                type="password"
+                                placeholder="Maximo 12 caracteres"
+                                maxlength="12"
+                                pattern="[A-Za-z0-9]{1,12}"
+                                title="La contraseña debe tener un máximo de 12 caracteres alfanuméricos."
+                                required
+                            >
+                        </label>
+                        <button class="button button-secondary register-submit" type="submit">Crear cuenta</button>
                     </form>
 
                     <div class="availability-card" id="register-status" data-state="bloqueado">
-                        <p class="availability-label">Solicitud</p>
-                        <strong class="availability-title">Registro guiado</strong>
-                        <p class="availability-text">Deja tus datos para que el equipo comercial active el acceso adecuado.</p>
+                        <p class="availability-label">Registro</p>
+                        <strong class="availability-title">Alta de cliente</strong>
+                        <p class="availability-text">Rellena tus datos para crear una cuenta de cliente registrado en Linea Cano.</p>
                     </div>
                 </article>
             </div>

@@ -3,6 +3,7 @@ package com.lineacano.servidor;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +16,44 @@ public final class ServicioAutenticacion {
             FROM usuario_acceso ua
             LEFT JOIN cliente c ON c.id_dni = ua.id_dni
             WHERE ua.correo = ?
+            """;
+    private static final String SQL_EXISTE_CORREO = """
+            SELECT 1
+            FROM usuario_acceso
+            WHERE correo = ?
+            """;
+    private static final String SQL_EXISTE_DOCUMENTO = """
+            SELECT 1
+            FROM cliente
+            WHERE id_dni = ?
+            """;
+    private static final String SQL_INSERTAR_CLIENTE = """
+            INSERT INTO cliente (id_dni, nombre, apellido1, correo, telefono)
+            VALUES (?, ?, ?, ?, ?)
+            """;
+    private static final String SQL_INSERTAR_USUARIO = """
+            INSERT INTO usuario_acceso (correo, contrasena_hash, rol, activo, id_dni)
+            VALUES (?, ?, ?, 1, ?)
+            """;
+    private static final String SQL_INSERTAR_CLIENTE_HORECA = """
+            INSERT INTO cliente_horeca (id_dni, empresa, cif, correo_profesional, telefono_contacto)
+            VALUES (?, ?, ?, ?, ?)
+            """;
+    private static final String SQL_CREAR_TABLA_CLIENTE_HORECA = """
+            CREATE TABLE IF NOT EXISTS cliente_horeca (
+              id_dni varchar(20) NOT NULL,
+              empresa varchar(150) NOT NULL,
+              cif varchar(20) NOT NULL,
+              correo_profesional varchar(100) NOT NULL,
+              telefono_contacto varchar(20) DEFAULT NULL,
+              fecha_alta timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (id_dni),
+              UNIQUE KEY uq_cliente_horeca_cif (cif),
+              UNIQUE KEY uq_cliente_horeca_correo (correo_profesional),
+              CONSTRAINT fk_cliente_horeca_cliente
+                FOREIGN KEY (id_dni) REFERENCES cliente (id_dni)
+                ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """;
 
     private final BaseDeDatos baseDeDatos;
@@ -95,6 +134,153 @@ public final class ServicioAutenticacion {
         return Optional.ofNullable(sesiones.get(token));
     }
 
+    public String registrarNuevoUsuario(
+            String documento,
+            String nombre,
+            String apellido,
+            String correo,
+            String telefono,
+            String contrasena
+    ) throws SQLException {
+        validarDocumento(documento, "El DNI o documento es obligatorio.");
+        validarTexto(nombre, "El nombre es obligatorio.");
+        validarTexto(apellido, "El primer apellido es obligatorio.");
+        validarCorreo(correo);
+        validarContrasena(contrasena);
+
+        String documentoNormalizado = normalizarDocumento(documento);
+        String nombreNormalizado = nombre.trim();
+        String apellidoNormalizado = apellido.trim();
+        String correoNormalizado = correo.trim().toLowerCase();
+        String telefonoNormalizado = limpiarSiVacio(telefono);
+        String hashContrasena = Contrasenas.sha256(contrasena.trim());
+
+        var conexion = baseDeDatos.obtenerConexion();
+        boolean autocommitOriginal = conexion.getAutoCommit();
+
+        try {
+            conexion.setAutoCommit(false);
+            validarDisponibilidadRegistro(correoNormalizado, documentoNormalizado);
+
+            try (PreparedStatement insertarCliente = conexion.prepareStatement(SQL_INSERTAR_CLIENTE);
+                 PreparedStatement insertarUsuario = conexion.prepareStatement(SQL_INSERTAR_USUARIO)) {
+                insertarCliente.setString(1, documentoNormalizado);
+                insertarCliente.setString(2, nombreNormalizado);
+                insertarCliente.setString(3, apellidoNormalizado);
+                insertarCliente.setString(4, correoNormalizado);
+                insertarCliente.setString(5, telefonoNormalizado);
+                insertarCliente.executeUpdate();
+
+                insertarUsuario.setString(1, correoNormalizado);
+                insertarUsuario.setString(2, hashContrasena);
+                insertarUsuario.setString(3, "registrado");
+                insertarUsuario.setString(4, documentoNormalizado);
+                insertarUsuario.executeUpdate();
+            }
+
+            conexion.commit();
+
+            return """
+                    {
+                      "titulo":"Registro completado",
+                      "mensaje":"La cuenta de %s ya esta activa. Puedes iniciar sesion desde este mismo frontal.",
+                      "correo":"%s",
+                      "rol":"registrado"
+                    }
+                    """.formatted(
+                    UtilJson.escapar(nombreNormalizado),
+                    UtilJson.escapar(correoNormalizado)
+            );
+        } catch (Exception excepcion) {
+            conexion.rollback();
+            throw excepcion;
+        } finally {
+            conexion.setAutoCommit(autocommitOriginal);
+        }
+    }
+
+    public String altaClienteHoreca(
+            String documento,
+            String nombreContacto,
+            String apellidoContacto,
+            String empresa,
+            String cif,
+            String correo,
+            String telefono,
+            String contrasena
+    ) throws SQLException {
+        validarDocumento(documento, "El DNI del contacto es obligatorio.");
+        validarTexto(nombreContacto, "El nombre del contacto es obligatorio.");
+        validarTexto(apellidoContacto, "El primer apellido del contacto es obligatorio.");
+        validarTexto(empresa, "La empresa es obligatoria.");
+        validarDocumento(cif, "El CIF es obligatorio.");
+        validarCorreo(correo);
+        validarContrasena(contrasena);
+
+        String documentoNormalizado = normalizarDocumento(documento);
+        String nombreNormalizado = nombreContacto.trim();
+        String apellidoNormalizado = apellidoContacto.trim();
+        String empresaNormalizada = empresa.trim();
+        String cifNormalizado = normalizarDocumento(cif);
+        String correoNormalizado = correo.trim().toLowerCase();
+        String telefonoNormalizado = limpiarSiVacio(telefono);
+        String hashContrasena = Contrasenas.sha256(contrasena.trim());
+
+        var conexion = baseDeDatos.obtenerConexion();
+        boolean autocommitOriginal = conexion.getAutoCommit();
+
+        try {
+            conexion.setAutoCommit(false);
+            asegurarTablaClienteHoreca();
+            validarDisponibilidadRegistro(correoNormalizado, documentoNormalizado);
+
+            try (PreparedStatement insertarCliente = conexion.prepareStatement(SQL_INSERTAR_CLIENTE);
+                 PreparedStatement insertarUsuario = conexion.prepareStatement(SQL_INSERTAR_USUARIO);
+                 PreparedStatement insertarClienteHoreca = conexion.prepareStatement(SQL_INSERTAR_CLIENTE_HORECA)) {
+                insertarCliente.setString(1, documentoNormalizado);
+                insertarCliente.setString(2, nombreNormalizado);
+                insertarCliente.setString(3, apellidoNormalizado);
+                insertarCliente.setString(4, correoNormalizado);
+                insertarCliente.setString(5, telefonoNormalizado);
+                insertarCliente.executeUpdate();
+
+                insertarUsuario.setString(1, correoNormalizado);
+                insertarUsuario.setString(2, hashContrasena);
+                insertarUsuario.setString(3, "horeca");
+                insertarUsuario.setString(4, documentoNormalizado);
+                insertarUsuario.executeUpdate();
+
+                insertarClienteHoreca.setString(1, documentoNormalizado);
+                insertarClienteHoreca.setString(2, empresaNormalizada);
+                insertarClienteHoreca.setString(3, cifNormalizado);
+                insertarClienteHoreca.setString(4, correoNormalizado);
+                insertarClienteHoreca.setString(5, telefonoNormalizado);
+                insertarClienteHoreca.executeUpdate();
+            }
+
+            conexion.commit();
+
+            return """
+                    {
+                      "titulo":"Cliente HORECA creado",
+                      "mensaje":"%s ya dispone de acceso profesional activo.",
+                      "correo":"%s",
+                      "empresa":"%s",
+                      "rol":"horeca"
+                    }
+                    """.formatted(
+                    UtilJson.escapar(nombreNormalizado + " " + apellidoNormalizado),
+                    UtilJson.escapar(correoNormalizado),
+                    UtilJson.escapar(empresaNormalizada)
+            );
+        } catch (Exception excepcion) {
+            conexion.rollback();
+            throw excepcion;
+        } finally {
+            conexion.setAutoCommit(autocommitOriginal);
+        }
+    }
+
     private String construirNombreVisible(String nombre, String apellido1, String valorPorDefecto) {
         String nombreCompuesto = ((nombre == null ? "" : nombre.trim()) + " " + (apellido1 == null ? "" : apellido1.trim())).trim();
         return nombreCompuesto.isBlank() ? valorPorDefecto : nombreCompuesto;
@@ -107,8 +293,90 @@ public final class ServicioAutenticacion {
 
         return switch (rolBruto.trim().toLowerCase()) {
             case "member", "registrado" -> "registrado";
+            case "horeca" -> "horeca";
             case "master", "maestro", "comercial" -> "maestro";
             default -> rolBruto.trim().toLowerCase();
         };
+    }
+
+    private void validarDisponibilidadRegistro(String correo, String documento) throws SQLException {
+        if (existeCorreo(correo)) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese correo.");
+        }
+
+        if (existeDocumento(documento)) {
+            throw new IllegalArgumentException("Ya existe un cliente con ese documento.");
+        }
+    }
+
+    private boolean existeCorreo(String correo) throws SQLException {
+        try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_EXISTE_CORREO)) {
+            sentencia.setString(1, correo);
+
+            try (ResultSet resultados = sentencia.executeQuery()) {
+                return resultados.next();
+            }
+        }
+    }
+
+    private boolean existeDocumento(String documento) throws SQLException {
+        try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_EXISTE_DOCUMENTO)) {
+            sentencia.setString(1, documento);
+
+            try (ResultSet resultados = sentencia.executeQuery()) {
+                return resultados.next();
+            }
+        }
+    }
+
+    private void asegurarTablaClienteHoreca() throws SQLException {
+        try (Statement sentencia = baseDeDatos.obtenerConexion().createStatement()) {
+            sentencia.executeUpdate(SQL_CREAR_TABLA_CLIENTE_HORECA);
+        }
+    }
+
+    private void validarCorreo(String correo) {
+        if (correo == null || correo.isBlank() || !correo.contains("@")) {
+            throw new IllegalArgumentException("El correo es obligatorio y debe tener un formato valido.");
+        }
+    }
+
+    private void validarContrasena(String contrasena) {
+        if (contrasena == null || contrasena.isBlank()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria.");
+        }
+
+        if (!contrasena.matches("[A-Za-z0-9]{1,12}")) {
+            throw new IllegalArgumentException("La contraseña debe tener un maximo de 12 caracteres alfanumericos.");
+        }
+    }
+
+    private void validarDocumento(String documento, String mensajeError) {
+        if (documento == null || documento.isBlank()) {
+            throw new IllegalArgumentException(mensajeError);
+        }
+
+        if (!normalizarDocumento(documento).matches("[A-Z0-9]{5,20}")) {
+            throw new IllegalArgumentException("El documento o CIF debe tener entre 5 y 20 caracteres alfanumericos.");
+        }
+    }
+
+    private void validarTexto(String valor, String mensajeError) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException(mensajeError);
+        }
+    }
+
+    private String normalizarDocumento(String valor) {
+        return valor == null ? "" : valor.trim().toUpperCase().replaceAll("\\s+", "");
+    }
+
+    private String limpiarSiVacio(String valor) {
+        if (valor == null) {
+            return null;
+        }
+
+        String valorNormalizado = valor.trim();
+        return valorNormalizado.isBlank() ? null : valorNormalizado;
     }
 }

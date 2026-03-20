@@ -35,6 +35,8 @@ public final class Aplicacion {
         HttpServer servidor = HttpServer.create(new InetSocketAddress(configuracion.puerto()), 0);
         servidor.createContext("/api/salud", intercambio -> escribirJson(intercambio, 200, "{\"estado\":\"ok\"}"));
         servidor.createContext("/api/sesion/iniciar", new ControladorInicioSesion(servicioAutenticacion));
+        servidor.createContext("/api/usuarios/registro", new ControladorRegistroUsuario(servicioAutenticacion));
+        servidor.createContext("/api/admin/clientes-horeca", new ControladorAltaHoreca(servicioAutenticacion));
         servidor.createContext("/api/disponibilidad", new ControladorDisponibilidad(servicioReservas, servicioAutenticacion));
         servidor.createContext("/api/reservas", new ControladorReserva(servicioReservas, servicioAutenticacion));
         servidor.createContext("/", new ControladorArchivosEstaticos(configuracion.raizWeb()));
@@ -77,6 +79,90 @@ public final class Aplicacion {
         }
     }
 
+    private static final class ControladorRegistroUsuario implements HttpHandler {
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorRegistroUsuario(ServicioAutenticacion servicioAutenticacion) {
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"POST".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Map<String, String> cuerpo = analizarCuerpo(intercambio);
+
+            try {
+                String json = servicioAutenticacion.registrarNuevoUsuario(
+                        cuerpo.get("documento"),
+                        cuerpo.get("nombre"),
+                        cuerpo.get("apellido"),
+                        cuerpo.get("correo"),
+                        cuerpo.get("telefono"),
+                        cuerpo.get("contrasena")
+                );
+                escribirJson(intercambio, 201, json);
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            }
+        }
+    }
+
+    private static final class ControladorAltaHoreca implements HttpHandler {
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorAltaHoreca(ServicioAutenticacion servicioAutenticacion) {
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"POST".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Optional<UsuarioSesion> sesion = servicioAutenticacion.buscarPorToken(
+                    intercambio.getRequestHeaders().getFirst("X-Linea-Token")
+            );
+
+            if (sesion.isEmpty()) {
+                escribirJson(intercambio, 401, "{\"error\":\"Debes iniciar sesion como administrador para dar de alta clientes HORECA.\"}");
+                return;
+            }
+
+            if (!"maestro".equals(sesion.get().rol())) {
+                escribirJson(intercambio, 403, "{\"error\":\"Tu perfil no puede crear clientes HORECA.\"}");
+                return;
+            }
+
+            Map<String, String> cuerpo = analizarCuerpo(intercambio);
+
+            try {
+                String json = servicioAutenticacion.altaClienteHoreca(
+                        cuerpo.get("documento"),
+                        cuerpo.get("nombreContacto"),
+                        cuerpo.get("apellidoContacto"),
+                        cuerpo.get("empresa"),
+                        cuerpo.get("cif"),
+                        cuerpo.get("correo"),
+                        cuerpo.get("telefono"),
+                        cuerpo.get("contrasena")
+                );
+                escribirJson(intercambio, 201, json);
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            }
+        }
+    }
+
     private static final class ControladorReserva implements HttpHandler {
         private final ServicioReservas servicioReservas;
         private final ServicioAutenticacion servicioAutenticacion;
@@ -103,7 +189,7 @@ public final class Aplicacion {
             }
 
             String rol = sesion.get().rol();
-            if (!"registrado".equals(rol) && !"maestro".equals(rol)) {
+            if (!"registrado".equals(rol) && !"maestro".equals(rol) && !"horeca".equals(rol)) {
                 escribirJson(intercambio, 403, "{\"error\":\"Tu rol no tiene permiso para crear reservas.\"}");
                 return;
             }
@@ -160,7 +246,7 @@ public final class Aplicacion {
             }
 
             String rol = sesion.get().rol();
-            if (!"registrado".equals(rol) && !"maestro".equals(rol)) {
+            if (!"registrado".equals(rol) && !"maestro".equals(rol) && !"horeca".equals(rol)) {
                 escribirJson(intercambio, 403, "{\"error\":\"Tu rol no tiene permiso para ver disponibilidad.\"}");
                 return;
             }
