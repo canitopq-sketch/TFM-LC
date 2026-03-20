@@ -1,0 +1,5 @@
+.DS_Store
+out/
+
+# Configuracion local con credenciales
+config/application.properties
