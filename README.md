@@ -27,6 +27,8 @@ Proyecto web con parte visual en HTML, CSS y JavaScript, y backend en Java para 
 - Desbloquea la zona privada solo para roles `registrado` y `maestro`.
 - Permite consultar disponibilidad real desde la base de datos.
 - Permite crear una reserva real de prueba en las tablas `reserva` y `reserva_habitacion`.
+- Permite listar y cancelar reservas futuras desde el area privada del cliente.
+- Persiste las sesiones en MySQL y valida el token aunque el servidor se reinicie.
 - Sirve la web y la API desde un servidor Java ligero.
 
 ## Requisitos
@@ -53,7 +55,7 @@ cp config/application.properties.example config/application.properties
 app.puerto=8080
 app.raizWeb=.
 
-bd.url=jdbc:mysql://localhost:3306/linea_cano?serverTimezone=Europe/Madrid&useSSL=false
+bd.url=jdbc:mysql://localhost:3306/linea_cano?serverTimezone=Europe/Madrid&useSSL=false&allowPublicKeyRetrieval=true
 bd.usuario=root
 bd.contrasena=TU_CONTRASENA
 ```
@@ -88,8 +90,11 @@ Después abre:
 
 - `GET /api/salud`
 - `POST /api/sesion/iniciar`
+- `GET /api/sesion/validar`
 - `GET /api/disponibilidad?fechaEntrada=2026-06-01&fechaSalida=2026-06-05&huespedes=2`
 - `POST /api/reservas`
+- `GET /api/reservas/mis-reservas`
+- `POST /api/reservas/cancelar`
 
 ### Ejemplo de login JSON
 
@@ -117,4 +122,4 @@ Después abre:
 - Panel específico para clientes
 - Panel específico para maestro/comercial
 - Registro real de usuarios
-- Persistencia de sesiones
+- Integracion futura con cierres de sesion y caducidad configurable

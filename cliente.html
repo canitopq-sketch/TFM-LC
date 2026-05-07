@@ -130,6 +130,35 @@
                 </aside>
             </div>
         </section>
+
+        <section class="section">
+            <div class="section-heading">
+                <p class="eyebrow">Mis reservas</p>
+                <h2>Consulta las reservas ya registradas y cancela las futuras desde tu area privada.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card">
+                    <span class="role-kicker">Historico</span>
+                    <h3>Tus estancias confirmadas quedan visibles en este resumen operativo.</h3>
+                    <p class="private-text">
+                        Esta seccion permite revisar fechas, estado, habitacion asignada e importe estimado de cada reserva
+                        vinculada a tu usuario.
+                    </p>
+                    <button class="button button-secondary booking-submit" id="refresh-reservations" type="button">Actualizar mis reservas</button>
+                </article>
+
+                <article class="private-card">
+                    <div class="availability-card" id="reservations-status" data-state="bloqueado">
+                        <p class="availability-label">Estado de reservas</p>
+                        <strong class="availability-title">Pendiente de consulta</strong>
+                        <p class="availability-text">Pulsa en actualizar para cargar el historico del cliente autenticado.</p>
+                    </div>
+                </article>
+            </div>
+
+            <div class="reservation-history" id="reservation-history" aria-live="polite"></div>
+        </section>
     </main>
 
     <script src="portal-privado.js"></script>

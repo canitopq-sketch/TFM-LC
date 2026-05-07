@@ -22,3 +22,14 @@ CREATE TABLE IF NOT EXISTS `cliente_horeca` (
     FOREIGN KEY (`id_dni`) REFERENCES `cliente` (`id_dni`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `sesion_acceso` (
+  `token` varchar(80) NOT NULL,
+  `correo` varchar(100) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`token`),
+  KEY `fk_sesion_acceso_usuario` (`correo`),
+  CONSTRAINT `fk_sesion_acceso_usuario`
+    FOREIGN KEY (`correo`) REFERENCES `usuario_acceso` (`correo`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

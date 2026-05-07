@@ -1,16 +1,18 @@
 package com.lineacano.servidor;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public final class ServicioAutenticacion {
+    private static final Duration DURACION_MAXIMA_SESION = Duration.ofDays(7);
     private static final String SQL_INICIO_SESION = """
             SELECT ua.correo, ua.contrasena_hash, ua.rol, ua.activo, ua.id_dni, c.nombre, c.apellido1
             FROM usuario_acceso ua
@@ -55,12 +57,47 @@ public final class ServicioAutenticacion {
                 ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """;
+    private static final String SQL_CREAR_TABLA_SESIONES = """
+            CREATE TABLE IF NOT EXISTS sesion_acceso (
+              token varchar(80) NOT NULL,
+              correo varchar(100) NOT NULL,
+              fecha_creacion timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (token),
+              KEY fk_sesion_acceso_usuario (correo),
+              CONSTRAINT fk_sesion_acceso_usuario
+                FOREIGN KEY (correo) REFERENCES usuario_acceso (correo)
+                ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """;
+    private static final String SQL_INSERTAR_SESION = """
+            INSERT INTO sesion_acceso (token, correo, fecha_creacion)
+            VALUES (?, ?, ?)
+            """;
+    private static final String SQL_BUSCAR_SESION = """
+            SELECT sa.token, sa.fecha_creacion, ua.correo, ua.rol, ua.activo, ua.id_dni, c.nombre, c.apellido1
+            FROM sesion_acceso sa
+            INNER JOIN usuario_acceso ua ON ua.correo = sa.correo
+            LEFT JOIN cliente c ON c.id_dni = ua.id_dni
+            WHERE sa.token = ?
+            """;
+    private static final String SQL_ELIMINAR_SESION = """
+            DELETE FROM sesion_acceso
+            WHERE token = ?
+            """;
+    private static final String SQL_ELIMINAR_SESIONES_CADUCADAS = """
+            DELETE FROM sesion_acceso
+            WHERE fecha_creacion < ?
+            """;
 
     private final BaseDeDatos baseDeDatos;
-    private final ConcurrentMap<String, UsuarioSesion> sesiones = new ConcurrentHashMap<>();
 
     public ServicioAutenticacion(BaseDeDatos baseDeDatos) {
         this.baseDeDatos = baseDeDatos;
+        try {
+            asegurarTablaSesiones();
+        } catch (SQLException excepcion) {
+            throw new IllegalStateException("No se pudo preparar la tabla de sesiones.", excepcion);
+        }
     }
 
     public UsuarioSesion iniciarSesion(String usuario, String contrasena) throws SQLException {
@@ -102,17 +139,17 @@ public final class ServicioAutenticacion {
 
                 String rolNormalizado = normalizarRol(resultados.getString("rol"));
 
-                // La sesión se guarda en memoria porque el objetivo actual es un prototipo funcional.
+                Instant fechaCreacion = Instant.now();
                 UsuarioSesion sesion = new UsuarioSesion(
                         UUID.randomUUID().toString(),
                         correoNormalizado,
                         nombreVisible,
                         rolNormalizado,
                         resultados.getString("id_dni"),
-                        Instant.now()
+                        fechaCreacion
                 );
 
-                sesiones.put(sesion.token(), sesion);
+                registrarSesionPersistente(sesion, fechaCreacion);
                 return sesion;
             }
         } catch (SQLException excepcion) {
@@ -131,7 +168,47 @@ public final class ServicioAutenticacion {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(sesiones.get(token));
+        try {
+            limpiarSesionesCaducadas();
+
+            try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_BUSCAR_SESION)) {
+                sentencia.setString(1, token.trim());
+
+                try (ResultSet resultados = sentencia.executeQuery()) {
+                    if (!resultados.next()) {
+                        return Optional.empty();
+                    }
+
+                    if (!resultados.getBoolean("activo")) {
+                        eliminarSesion(token);
+                        return Optional.empty();
+                    }
+
+                    Timestamp marcaTiempo = resultados.getTimestamp("fecha_creacion");
+                    Instant fechaCreacion = marcaTiempo == null ? Instant.now() : marcaTiempo.toInstant();
+
+                    if (fechaCreacion.plus(DURACION_MAXIMA_SESION).isBefore(Instant.now())) {
+                        eliminarSesion(token);
+                        return Optional.empty();
+                    }
+
+                    return Optional.of(new UsuarioSesion(
+                            resultados.getString("token"),
+                            resultados.getString("correo"),
+                            construirNombreVisible(
+                                    resultados.getString("nombre"),
+                                    resultados.getString("apellido1"),
+                                    resultados.getString("correo")
+                            ),
+                            normalizarRol(resultados.getString("rol")),
+                            resultados.getString("id_dni"),
+                            fechaCreacion
+                    ));
+                }
+            }
+        } catch (SQLException excepcion) {
+            return Optional.empty();
+        }
     }
 
     public String registrarNuevoUsuario(
@@ -332,6 +409,39 @@ public final class ServicioAutenticacion {
     private void asegurarTablaClienteHoreca() throws SQLException {
         try (Statement sentencia = baseDeDatos.obtenerConexion().createStatement()) {
             sentencia.executeUpdate(SQL_CREAR_TABLA_CLIENTE_HORECA);
+        }
+    }
+
+    private void asegurarTablaSesiones() throws SQLException {
+        try (Statement sentencia = baseDeDatos.obtenerConexion().createStatement()) {
+            sentencia.executeUpdate(SQL_CREAR_TABLA_SESIONES);
+        }
+    }
+
+    private void registrarSesionPersistente(UsuarioSesion sesion, Instant fechaCreacion) throws SQLException {
+        Connection conexion = baseDeDatos.obtenerConexion();
+
+        try (PreparedStatement sentencia = conexion.prepareStatement(SQL_INSERTAR_SESION)) {
+            sentencia.setString(1, sesion.token());
+            sentencia.setString(2, sesion.usuario());
+            sentencia.setTimestamp(3, Timestamp.from(fechaCreacion));
+            sentencia.executeUpdate();
+        }
+    }
+
+    private void limpiarSesionesCaducadas() throws SQLException {
+        Instant fechaLimite = Instant.now().minus(DURACION_MAXIMA_SESION);
+
+        try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_ELIMINAR_SESIONES_CADUCADAS)) {
+            sentencia.setTimestamp(1, Timestamp.from(fechaLimite));
+            sentencia.executeUpdate();
+        }
+    }
+
+    private void eliminarSesion(String token) throws SQLException {
+        try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_ELIMINAR_SESION)) {
+            sentencia.setString(1, token);
+            sentencia.executeUpdate();
         }
     }
 

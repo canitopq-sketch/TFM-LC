@@ -41,6 +41,23 @@ public final class ServicioReservas {
             INSERT INTO reserva_habitacion (id_reserva, num_habitacion)
             VALUES (?, ?)
             """;
+    private static final String SQL_RESERVAS_CLIENTE = """
+            SELECT r.id_reserva, r.fecha_entrada, r.fecha_salida, r.estado_reserva, r.importe_total, rh.num_habitacion
+            FROM reserva r
+            LEFT JOIN reserva_habitacion rh ON rh.id_reserva = r.id_reserva
+            WHERE r.id_dni = ?
+            ORDER BY r.fecha_entrada DESC, r.id_reserva DESC
+            """;
+    private static final String SQL_BUSCAR_RESERVA_CLIENTE = """
+            SELECT id_reserva, fecha_entrada, estado_reserva
+            FROM reserva
+            WHERE id_reserva = ? AND id_dni = ?
+            """;
+    private static final String SQL_CANCELAR_RESERVA = """
+            UPDATE reserva
+            SET estado_reserva = 'Cancelada'
+            WHERE id_reserva = ? AND id_dni = ?
+            """;
 
     private final BaseDeDatos baseDeDatos;
 
@@ -127,7 +144,7 @@ public final class ServicioReservas {
                       "mensaje":"La reserva ha quedado registrada correctamente.",
                       "idReserva":%d,
                       "habitacionAsignada":%d,
-                      "importeTotal":%.2f,
+                      "importeTotal":%s,
                       "numeroNoches":%d,
                       "fechaEntrada":"%s",
                       "fechaSalida":"%s",
@@ -136,7 +153,7 @@ public final class ServicioReservas {
                     """.formatted(
                     idReserva,
                     habitacionAsignada.numeroHabitacion(),
-                    importeTotal,
+                    formatearNumeroJson(java.math.BigDecimal.valueOf(importeTotal)),
                     numeroNoches,
                     fechaEntrada,
                     fechaSalida,
@@ -148,6 +165,99 @@ public final class ServicioReservas {
         } finally {
             conexion.setAutoCommit(autocommitOriginal);
         }
+    }
+
+    public String listarReservasCliente(String idDni) throws SQLException {
+        if (idDni == null || idDni.isBlank()) {
+            throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado.");
+        }
+
+        List<String> reservas = new ArrayList<>();
+
+        try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_RESERVAS_CLIENTE)) {
+            sentencia.setString(1, idDni);
+
+            try (ResultSet resultados = sentencia.executeQuery()) {
+                while (resultados.next()) {
+                    reservas.add("""
+                            {
+                              "idReserva":%d,
+                              "fechaEntrada":"%s",
+                              "fechaSalida":"%s",
+                              "estado":"%s",
+                              "importeTotal":%s,
+                              "habitacionAsignada":%s
+                            }
+                            """.formatted(
+                            resultados.getInt("id_reserva"),
+                            resultados.getObject("fecha_entrada", LocalDate.class),
+                            resultados.getObject("fecha_salida", LocalDate.class),
+                            UtilJson.escapar(resultados.getString("estado_reserva")),
+                            formatearNumeroJson(resultados.getBigDecimal("importe_total")),
+                            resultados.getObject("num_habitacion") == null ? "null" : resultados.getInt("num_habitacion")
+                    ));
+                }
+            }
+        }
+
+        return """
+                {
+                  "titulo":"Reservas del cliente",
+                  "total":%d,
+                  "reservas":[%s]
+                }
+                """.formatted(
+                reservas.size(),
+                String.join(",", reservas)
+        );
+    }
+
+    public String cancelarReserva(int idReserva, String idDni) throws SQLException {
+        if (idDni == null || idDni.isBlank()) {
+            throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado.");
+        }
+
+        Connection conexion = baseDeDatos.obtenerConexion();
+
+        try (PreparedStatement buscarReserva = conexion.prepareStatement(SQL_BUSCAR_RESERVA_CLIENTE)) {
+            buscarReserva.setInt(1, idReserva);
+            buscarReserva.setString(2, idDni);
+
+            try (ResultSet resultados = buscarReserva.executeQuery()) {
+                if (!resultados.next()) {
+                    throw new IllegalArgumentException("La reserva indicada no pertenece al cliente autenticado.");
+                }
+
+                String estadoReserva = resultados.getString("estado_reserva");
+                LocalDate fechaEntrada = resultados.getObject("fecha_entrada", LocalDate.class);
+
+                if ("Cancelada".equalsIgnoreCase(estadoReserva)) {
+                    throw new IllegalArgumentException("La reserva ya estaba cancelada.");
+                }
+
+                if (fechaEntrada != null && !fechaEntrada.isAfter(LocalDate.now())) {
+                    throw new IllegalArgumentException("Solo se pueden cancelar reservas futuras.");
+                }
+            }
+        }
+
+        try (PreparedStatement cancelarReserva = conexion.prepareStatement(SQL_CANCELAR_RESERVA)) {
+            cancelarReserva.setInt(1, idReserva);
+            cancelarReserva.setString(2, idDni);
+            int filasActualizadas = cancelarReserva.executeUpdate();
+
+            if (filasActualizadas < 1) {
+                throw new SQLException("No se pudo actualizar el estado de la reserva.");
+            }
+        }
+
+        return """
+                {
+                  "titulo":"Reserva cancelada",
+                  "mensaje":"La reserva %d ha quedado cancelada correctamente.",
+                  "idReserva":%d
+                }
+                """.formatted(idReserva, idReserva);
     }
 
     private int contarTotalHabitaciones(Connection conexion) throws SQLException {
@@ -217,6 +327,10 @@ public final class ServicioReservas {
             sentencia.setInt(2, numeroHabitacion);
             sentencia.executeUpdate();
         }
+    }
+
+    private String formatearNumeroJson(java.math.BigDecimal valor) {
+        return valor == null ? "null" : valor.toPlainString();
     }
 
     private record HabitacionLibre(int numeroHabitacion, double precioNoche) {

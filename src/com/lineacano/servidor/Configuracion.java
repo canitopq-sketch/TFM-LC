@@ -28,7 +28,7 @@ public record Configuracion(
         String urlBaseDeDatos = resolver(
                 propiedades,
                 "bd.url",
-                "jdbc:mysql://localhost:3306/linea_cano?serverTimezone=Europe/Madrid&useSSL=false"
+                "jdbc:mysql://localhost:3306/linea_cano?serverTimezone=Europe/Madrid&useSSL=false&allowPublicKeyRetrieval=true"
         );
         String usuarioBaseDeDatos = resolver(propiedades, "bd.usuario", "root");
         String contrasenaBaseDeDatos = resolver(propiedades, "bd.contrasena", "");
