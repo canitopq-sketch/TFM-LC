@@ -185,9 +185,12 @@ Contiene:
 Contiene:
 
 - estado de sesión
-- bloque de experiencia
+- accesos rápidos a reserva, tienda e historial
 - consulta de disponibilidad
 - confirmación de reserva
+- tienda privada de producto premium
+- carrito de compra en navegador
+- historial de compras de prototipo
 
 ### 4.8. `comercial.html`
 
@@ -277,7 +280,22 @@ Permite:
 - registrar datos en `reserva`
 - registrar datos en `reserva_habitacion`
 
-### 6.6. Alta HORECA
+### 6.6. Carrito y compras de producto
+
+El panel de cliente incorpora una tienda privada de prototipo.
+
+Permite:
+
+- consultar productos premium disponibles
+- añadir productos al carrito
+- modificar cantidades
+- vaciar el carrito
+- confirmar una compra simulada
+- guardar el historial de compras en el navegador del usuario
+
+Esta capa permite mostrar el flujo comercial de producto sin ampliar todavía el modelo de base de datos.
+
+### 6.7. Alta HORECA
 
 Existe alta manual de cliente HORECA desde el panel `comercial.html`.
 

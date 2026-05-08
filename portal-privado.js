@@ -15,8 +15,33 @@ const estadoHoreca = document.querySelector("#estado-horeca");
 const botonActualizarReservas = document.querySelector("#boton-actualizar-reservas");
 const estadoReservas = document.querySelector("#estado-reservas");
 const historialReservas = document.querySelector("#historial-reservas");
+const botonesAgregarProducto = document.querySelectorAll("[data-action='agregar-producto']");
+const listaCarrito = document.querySelector("#lista-carrito");
+const totalCarrito = document.querySelector("#total-carrito");
+const estadoCarrito = document.querySelector("#estado-carrito");
+const botonConfirmarCompra = document.querySelector("#boton-confirmar-compra");
+const botonVaciarCarrito = document.querySelector("#boton-vaciar-carrito");
+const historialCompras = document.querySelector("#historial-compras");
+const enlacesNavegacionPrivada = document.querySelectorAll(".site-nav a[href^='#']");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
+const CATALOGO_PRODUCTOS = {
+    iberico: {
+        nombre: "Seleccion iberica de montanera",
+        categoria: "Iberico",
+        precio: 89
+    },
+    buey: {
+        nombre: "Corte premium madurado",
+        categoria: "Buey",
+        precio: 126
+    },
+    despensa: {
+        nombre: "Cesta fresca de temporada",
+        categoria: "Despensa",
+        precio: 42
+    }
+};
 let sesionActiva = cargarSesion();
 let ultimaDisponibilidad = null;
 
@@ -108,7 +133,7 @@ botonConfirmarReserva.addEventListener("click", async () => {
 
         renderizarDisponibilidad(
             datos.titulo,
-            `${datos.mensaje} Habitacion ${datos.habitacionAsignada}. Reserva ${datos.idReserva}. Importe estimado ${formatearImporte(datos.importeTotal)}.`,
+            `${datos.mensaje} Estancia del ${formatearFecha(datos.fechaEntrada)} al ${formatearFecha(datos.fechaSalida)}. Habitacion ${datos.habitacionAsignada}. Reserva ${datos.idReserva}. Importe estimado ${formatearImporte(datos.importeTotal)}.`,
             "disponible"
         );
 
@@ -202,6 +227,34 @@ if (botonActualizarReservas) {
     });
 }
 
+botonesAgregarProducto.forEach((boton) => {
+    boton.addEventListener("click", () => {
+        agregarProductoAlCarrito(boton.dataset.producto);
+    });
+});
+
+if (botonConfirmarCompra) {
+    botonConfirmarCompra.addEventListener("click", confirmarCompra);
+}
+
+if (botonVaciarCarrito) {
+    botonVaciarCarrito.addEventListener("click", () => {
+        guardarCarrito([]);
+        renderizarCarrito();
+        renderizarEstadoCarrito("bloqueado", "Carrito vacio", "El pedido actual se ha vaciado correctamente.");
+    });
+}
+
+enlacesNavegacionPrivada.forEach((enlace) => {
+    enlace.addEventListener("click", () => {
+        marcarSeccionActiva(enlace.getAttribute("href"));
+    });
+});
+
+window.addEventListener("hashchange", () => {
+    marcarSeccionActiva(window.location.hash || "#panel");
+});
+
 function cargarSesion() {
     try {
         const valorGuardado = localStorage.getItem(CLAVE_ALMACENAMIENTO);
@@ -226,8 +279,10 @@ async function inicializarPortalPrivado() {
     sesionActiva = sesionValidada;
     localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(sesionActiva));
     protegerPagina();
+    marcarSeccionActiva(window.location.hash || "#panel");
     configurarFechas();
     configurarHistoricoReservas();
+    configurarCarrito();
 }
 
 function protegerPagina() {
@@ -259,8 +314,8 @@ function protegerPagina() {
         textoPrivado.textContent = "Este acceso profesional queda preparado para tarifas, catalogo premium, seguimiento de pedidos y operativa comercial.";
         estadoSesion.dataset.state = "horeca";
     } else {
-        tituloPrivado.textContent = "Frontal de cliente con acceso a disponibilidad real y confirmacion de reserva.";
-        textoPrivado.textContent = "Este entorno privado esta pensado para preparar la estancia y confirmar fechas directamente sobre el sistema.";
+        tituloPrivado.textContent = "Panel privado para reservar estancia, comprar producto y revisar tu actividad.";
+        textoPrivado.textContent = "Desde este entorno puedes confirmar fechas, preparar pedidos de producto y consultar tu historial operativo.";
         estadoSesion.dataset.state = "registrado";
     }
 }
@@ -277,6 +332,21 @@ function redirigirSegunPerfil(rol) {
     }
 
     window.location.href = "acceso.html";
+}
+
+function marcarSeccionActiva(hashActivo) {
+    if (!enlacesNavegacionPrivada.length) {
+        return;
+    }
+
+    enlacesNavegacionPrivada.forEach((enlace) => {
+        const estaActivo = enlace.getAttribute("href") === hashActivo;
+        if (estaActivo) {
+            enlace.setAttribute("aria-current", "true");
+        } else {
+            enlace.removeAttribute("aria-current");
+        }
+    });
 }
 
 function configurarHistoricoReservas() {
@@ -354,7 +424,7 @@ function renderizarListaReservas(reservas) {
         return `
             <article class="history-card" data-reserva="${reserva.idReserva}">
                 <p class="availability-label">Reserva ${reserva.idReserva}</p>
-                <h3>${reserva.fechaEntrada} al ${reserva.fechaSalida}</h3>
+                <h3>${formatearFecha(reserva.fechaEntrada)} al ${formatearFecha(reserva.fechaSalida)}</h3>
                 <p class="history-meta">Estado: ${reserva.estado} · Habitacion: ${reserva.habitacionAsignada ?? "Sin asignar"} · Importe: ${formatearImporte(reserva.importeTotal) || "Pendiente"}</p>
                 ${botonCancelar}
             </article>
@@ -364,6 +434,210 @@ function renderizarListaReservas(reservas) {
     historialReservas.querySelectorAll("[data-action='cancelar-reserva']").forEach((boton) => {
         boton.addEventListener("click", () => cancelarReservaCliente(boton.dataset.idReserva));
     });
+}
+
+function configurarCarrito() {
+    if (!listaCarrito || !totalCarrito || !historialCompras) {
+        return;
+    }
+
+    renderizarCarrito();
+    renderizarHistorialCompras();
+}
+
+function agregarProductoAlCarrito(idProducto) {
+    const producto = CATALOGO_PRODUCTOS[idProducto];
+    if (!producto) {
+        return;
+    }
+
+    const carrito = cargarCarrito();
+    const lineaExistente = carrito.find((linea) => linea.id === idProducto);
+
+    if (lineaExistente) {
+        lineaExistente.cantidad += 1;
+    } else {
+        carrito.push({
+            id: idProducto,
+            cantidad: 1
+        });
+    }
+
+    guardarCarrito(carrito);
+    renderizarCarrito();
+    renderizarEstadoCarrito("disponible", "Producto anadido", `${producto.nombre} se ha incorporado al carrito.`);
+}
+
+function renderizarCarrito() {
+    if (!listaCarrito || !totalCarrito) {
+        return;
+    }
+
+    const carrito = cargarCarrito();
+
+    if (carrito.length === 0) {
+        listaCarrito.innerHTML = `
+            <article class="cart-empty">
+                <strong>Carrito vacio</strong>
+                <p>Selecciona productos de la tienda privada.</p>
+            </article>
+        `;
+        totalCarrito.textContent = formatearImporte(0);
+        if (botonConfirmarCompra) {
+            botonConfirmarCompra.disabled = true;
+        }
+        return;
+    }
+
+    listaCarrito.innerHTML = carrito.map((linea) => {
+        const producto = CATALOGO_PRODUCTOS[linea.id];
+        const subtotal = producto.precio * linea.cantidad;
+
+        return `
+            <article class="cart-line">
+                <div>
+                    <span>${producto.categoria}</span>
+                    <strong>${producto.nombre}</strong>
+                    <small>${formatearImporte(producto.precio)} unidad · ${formatearImporte(subtotal)}</small>
+                </div>
+                <div class="cart-controls">
+                    <button type="button" data-action="restar-producto" data-producto="${linea.id}" aria-label="Restar ${producto.nombre}">-</button>
+                    <output>${linea.cantidad}</output>
+                    <button type="button" data-action="sumar-producto" data-producto="${linea.id}" aria-label="Sumar ${producto.nombre}">+</button>
+                </div>
+            </article>
+        `;
+    }).join("");
+
+    totalCarrito.textContent = formatearImporte(calcularTotalCarrito(carrito));
+    if (botonConfirmarCompra) {
+        botonConfirmarCompra.disabled = false;
+    }
+
+    listaCarrito.querySelectorAll("[data-action='sumar-producto']").forEach((boton) => {
+        boton.addEventListener("click", () => cambiarCantidadProducto(boton.dataset.producto, 1));
+    });
+
+    listaCarrito.querySelectorAll("[data-action='restar-producto']").forEach((boton) => {
+        boton.addEventListener("click", () => cambiarCantidadProducto(boton.dataset.producto, -1));
+    });
+}
+
+function cambiarCantidadProducto(idProducto, variacion) {
+    const carritoActualizado = cargarCarrito()
+        .map((linea) => linea.id === idProducto
+            ? { ...linea, cantidad: linea.cantidad + variacion }
+            : linea
+        )
+        .filter((linea) => linea.cantidad > 0);
+
+    guardarCarrito(carritoActualizado);
+    renderizarCarrito();
+}
+
+function confirmarCompra() {
+    const carrito = cargarCarrito();
+
+    if (carrito.length === 0) {
+        renderizarEstadoCarrito("aviso", "Carrito vacio", "Anade al menos un producto antes de confirmar la compra.");
+        return;
+    }
+
+    const compra = {
+        id: `LC-${Date.now()}`,
+        fecha: new Date().toISOString(),
+        estado: "Solicitud recibida",
+        total: calcularTotalCarrito(carrito),
+        lineas: carrito.map((linea) => ({
+            ...linea,
+            nombre: CATALOGO_PRODUCTOS[linea.id].nombre,
+            categoria: CATALOGO_PRODUCTOS[linea.id].categoria,
+            precio: CATALOGO_PRODUCTOS[linea.id].precio
+        }))
+    };
+
+    const historial = cargarHistorialCompras();
+    historial.unshift(compra);
+    guardarHistorialCompras(historial);
+    guardarCarrito([]);
+    renderizarCarrito();
+    renderizarHistorialCompras();
+    renderizarEstadoCarrito("disponible", "Compra registrada", `Pedido ${compra.id} guardado en tu historial de compras.`);
+}
+
+function renderizarHistorialCompras() {
+    if (!historialCompras) {
+        return;
+    }
+
+    const historial = cargarHistorialCompras();
+
+    if (historial.length === 0) {
+        historialCompras.innerHTML = `
+            <article class="history-card history-card-empty">
+                <strong>No hay compras registradas</strong>
+                <p>Los pedidos confirmados desde el carrito apareceran en este historial.</p>
+            </article>
+        `;
+        return;
+    }
+
+    historialCompras.innerHTML = historial.map((compra) => {
+        const fechaCompra = formatearFecha(compra.fecha);
+        const resumenLineas = compra.lineas
+            .map((linea) => `${linea.cantidad} x ${linea.nombre}`)
+            .join(" · ");
+
+        return `
+            <article class="history-card">
+                <p class="availability-label">Pedido ${compra.id}</p>
+                <h3>${fechaCompra}</h3>
+                <p class="history-meta">Estado: ${compra.estado} · Total: ${formatearImporte(compra.total)}</p>
+                <p class="history-meta">${resumenLineas}</p>
+            </article>
+        `;
+    }).join("");
+}
+
+function cargarCarrito() {
+    return cargarArrayLocal(claveCarrito());
+}
+
+function guardarCarrito(carrito) {
+    localStorage.setItem(claveCarrito(), JSON.stringify(carrito));
+}
+
+function cargarHistorialCompras() {
+    return cargarArrayLocal(claveHistorialCompras());
+}
+
+function guardarHistorialCompras(historial) {
+    localStorage.setItem(claveHistorialCompras(), JSON.stringify(historial));
+}
+
+function cargarArrayLocal(clave) {
+    try {
+        const valorGuardado = localStorage.getItem(clave);
+        const datos = valorGuardado ? JSON.parse(valorGuardado) : [];
+        return Array.isArray(datos) ? datos : [];
+    } catch {
+        return [];
+    }
+}
+
+function claveCarrito() {
+    return `linea_cano_carrito_${sesionActiva?.usuario || "anonimo"}`;
+}
+
+function claveHistorialCompras() {
+    return `linea_cano_compras_${sesionActiva?.usuario || "anonimo"}`;
+}
+
+function calcularTotalCarrito(carrito) {
+    return carrito.reduce((total, linea) => {
+        const producto = CATALOGO_PRODUCTOS[linea.id];
+        return producto ? total + producto.precio * linea.cantidad : total;
+    }, 0);
 }
 
 async function cancelarReservaCliente(idReserva) {
@@ -526,6 +800,26 @@ function formatearImporte(valor) {
     }).format(valor);
 }
 
+function formatearFecha(valor) {
+    if (!valor) {
+        return "";
+    }
+
+    const fecha = typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)
+        ? new Date(`${valor}T00:00:00`)
+        : new Date(valor);
+
+    if (Number.isNaN(fecha.getTime())) {
+        return String(valor);
+    }
+
+    return new Intl.DateTimeFormat("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    }).format(fecha);
+}
+
 function renderizarEstadoHoreca(estado, titulo, texto) {
     if (!estadoHoreca) {
         return;
@@ -547,6 +841,19 @@ function renderizarEstadoReservas(estado, titulo, texto) {
     estadoReservas.dataset.state = estado;
     estadoReservas.innerHTML = `
         <p class="availability-label">Estado de reservas</p>
+        <strong class="availability-title">${titulo}</strong>
+        <p class="availability-text">${texto}</p>
+    `;
+}
+
+function renderizarEstadoCarrito(estado, titulo, texto) {
+    if (!estadoCarrito) {
+        return;
+    }
+
+    estadoCarrito.dataset.state = estado;
+    estadoCarrito.innerHTML = `
+        <p class="availability-label">Estado del carrito</p>
         <strong class="availability-title">${titulo}</strong>
         <p class="availability-text">${texto}</p>
     `;
