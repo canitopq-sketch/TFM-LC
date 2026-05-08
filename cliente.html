@@ -17,8 +17,10 @@
         </a>
 
         <nav class="site-nav" aria-label="Navegacion privada">
-            <a href="#panel">Panel</a>
+            <a href="#panel" aria-current="true">Panel</a>
             <a href="#reserva">Reserva</a>
+            <a href="#tienda">Tienda</a>
+            <a href="#compras">Compras</a>
             <a href="index.html">Web publica</a>
         </nav>
 
@@ -29,10 +31,10 @@
         <section class="section private-hero">
             <div class="section-heading">
                 <p class="eyebrow">Area cliente</p>
-                <h2 id="titulo-pagina-privada">Tu estancia empieza aqui: disponibilidad real, reserva y siguientes servicios.</h2>
+                <h2 id="titulo-pagina-privada">Panel privado para reservar estancia, comprar producto y revisar tu actividad.</h2>
             </div>
 
-            <div class="private-grid">
+            <div class="client-overview">
                 <article class="private-card private-card-dark">
                     <span class="role-kicker">Sesion activa</span>
                     <h3 id="nombre-usuario-privado">Cliente registrado</h3>
@@ -47,23 +49,22 @@
                     </div>
                 </article>
 
-                <article class="private-card">
-                    <span class="role-kicker">Experiencia</span>
-                    <h3>Servicios y estancias preparados para una reserva personalizada.</h3>
-                    <div class="role-features">
-                        <article>
-                            <strong>Hotel boutique</strong>
-                            <span>Suites, entorno natural, descanso, privacidad y contacto directo con la dehesa.</span>
-                        </article>
-                        <article>
-                            <strong>Gastronomia km 0</strong>
-                            <span>Iberico, buey, huerta eco y experiencias de mesa vinculadas al territorio.</span>
-                        </article>
-                        <article>
-                            <strong>Experiencia 365</strong>
-                            <span>Piscinas climatizadas sostenibles, bienestar rural y escapadas de autor durante todo el ano.</span>
-                        </article>
-                    </div>
+                <article class="client-action-panel">
+                    <a class="client-action" href="#reserva">
+                        <span>01</span>
+                        <strong>Reservar estancia</strong>
+                        <small>Consulta disponibilidad real y confirma fechas.</small>
+                    </a>
+                    <a class="client-action" href="#tienda">
+                        <span>02</span>
+                        <strong>Comprar producto</strong>
+                        <small>Anade iberico, buey o despensa al carrito.</small>
+                    </a>
+                    <a class="client-action" href="#compras">
+                        <span>03</span>
+                        <strong>Revisar historial</strong>
+                        <small>Consulta reservas y pedidos guardados.</small>
+                    </a>
                 </article>
             </div>
         </section>
@@ -131,10 +132,79 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section shop-section" id="tienda">
             <div class="section-heading">
-                <p class="eyebrow">Mis reservas</p>
-                <h2>Consulta las reservas ya registradas y cancela las futuras desde tu area privada.</h2>
+                <p class="eyebrow">Tienda privada</p>
+                <h2>Producto Linea Cano para completar la experiencia desde el area cliente.</h2>
+            </div>
+
+            <div class="shop-layout">
+                <div class="product-shop-grid">
+                    <article class="shop-product-card">
+                        <img src="imagenes/Iberico.png" alt="Producto iberico Linea Cano">
+                        <div>
+                            <span class="role-kicker">Iberico</span>
+                            <h3>Seleccion iberica de montanera</h3>
+                            <p>Lote degustacion con jamon, lomo y embutido de origen propio.</p>
+                            <div class="shop-product-footer">
+                                <strong>89,00 €</strong>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="iberico">Anadir</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="shop-product-card">
+                        <img src="imagenes/buey.png" alt="Buey madurado Linea Cano">
+                        <div>
+                            <span class="role-kicker">Buey</span>
+                            <h3>Corte premium madurado</h3>
+                            <p>Pieza seleccionada para consumo gourmet con maduracion controlada.</p>
+                            <div class="shop-product-footer">
+                                <strong>126,00 €</strong>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="buey">Anadir</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="shop-product-card">
+                        <img src="imagenes/Fresco.png" alt="Despensa fresca Linea Cano">
+                        <div>
+                            <span class="role-kicker">Despensa</span>
+                            <h3>Cesta fresca de temporada</h3>
+                            <p>Huerta ecologica, complementos de finca y producto de proximidad.</p>
+                            <div class="shop-product-footer">
+                                <strong>42,00 €</strong>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="despensa">Anadir</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <aside class="cart-panel" aria-live="polite">
+                    <div class="booking-head">
+                        <span class="role-kicker">Carrito</span>
+                        <h3>Pedido actual</h3>
+                    </div>
+                    <div class="cart-items" id="lista-carrito"></div>
+                    <div class="cart-total">
+                        <span>Total</span>
+                        <strong id="total-carrito">0,00 €</strong>
+                    </div>
+                    <button class="button button-primary booking-submit" id="boton-confirmar-compra" type="button">Confirmar compra</button>
+                    <button class="button button-secondary booking-submit" id="boton-vaciar-carrito" type="button">Vaciar carrito</button>
+                    <div class="availability-card" id="estado-carrito" data-state="bloqueado">
+                        <p class="availability-label">Estado del carrito</p>
+                        <strong class="availability-title">Sin productos</strong>
+                        <p class="availability-text">Anade productos para preparar un pedido de prueba.</p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section" id="compras">
+            <div class="section-heading">
+                <p class="eyebrow">Historial</p>
+                <h2>Consulta tus reservas y compras desde una vista unica de actividad.</h2>
             </div>
 
             <div class="private-grid">
@@ -158,6 +228,14 @@
             </div>
 
             <div class="reservation-history" id="historial-reservas" aria-live="polite"></div>
+
+            <div class="purchase-history-wrap">
+                <div class="section-heading compact-heading">
+                    <p class="eyebrow">Mis compras</p>
+                    <h2>Pedidos de producto guardados en este navegador.</h2>
+                </div>
+                <div class="reservation-history" id="historial-compras" aria-live="polite"></div>
+            </div>
         </section>
     </main>
 

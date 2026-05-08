@@ -28,6 +28,7 @@ Proyecto web con parte visual en HTML, CSS y JavaScript, y backend en Java para 
 - Permite consultar disponibilidad real desde la base de datos.
 - Permite crear una reserva real de prueba en las tablas `reserva` y `reserva_habitacion`.
 - Permite listar y cancelar reservas futuras desde el area privada del cliente.
+- Incorpora una tienda privada con carrito e historial de compras de prototipo en el navegador.
 - Persiste las sesiones en MySQL y valida el token aunque el servidor se reinicie.
 - Sirve la web y la API desde un servidor Java ligero.
 
