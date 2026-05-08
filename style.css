@@ -1507,6 +1507,54 @@ img {
     margin-top: 1rem;
 }
 
+.reservation-history {
+    margin-top: 1.6rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.history-card {
+    padding: 1.6rem;
+    border-radius: 1.7rem;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(42, 76, 104, 0.1);
+    box-shadow: 0 16px 40px rgba(24, 41, 59, 0.08);
+}
+
+.history-card h3 {
+    margin-top: 0.9rem;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--navy-deep);
+}
+
+.history-meta {
+    margin-top: 0.9rem;
+    color: var(--muted);
+    line-height: 1.72;
+}
+
+.history-action {
+    margin-top: 1.2rem;
+}
+
+.history-card-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+.history-card-empty strong {
+    display: block;
+    color: var(--navy-deep);
+}
+
+.history-card-empty p {
+    margin-top: 0.7rem;
+    color: var(--muted);
+}
+
 .management-preview span {
     display: block;
     color: var(--muted);
@@ -1543,7 +1591,8 @@ img {
     .private-grid,
     .reservation-layout,
     .role-panel,
-    .stats-strip {
+    .stats-strip,
+    .reservation-history {
         grid-template-columns: 1fr;
     }
 

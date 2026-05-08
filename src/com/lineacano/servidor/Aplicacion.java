@@ -20,10 +20,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
+/**
+ * Punto de entrada del servidor HTTP ligero de Linea Cano.
+ *
+ * <p>Inicializa configuracion, conexion a base de datos, servicios de negocio y
+ * rutas publicas/API utilizadas por el prototipo funcional del TFM.</p>
+ */
 public final class Aplicacion {
     private Aplicacion() {
     }
 
+    /**
+     * Arranca el servidor web y registra los controladores de API y archivos estaticos.
+     *
+     * @param args argumentos de linea de comandos no utilizados
+     * @throws Exception si falla la carga de configuracion, la base de datos o el servidor HTTP
+     */
     public static void main(String[] args) throws Exception {
         // Carga la configuración y los servicios principales de la aplicación.
         Configuracion configuracion = Configuracion.cargar();
@@ -40,6 +52,8 @@ public final class Aplicacion {
         servidor.createContext("/api/admin/clientes-horeca", new ControladorAltaHoreca(servicioAutenticacion));
         servidor.createContext("/api/disponibilidad", new ControladorDisponibilidad(servicioReservas, servicioAutenticacion));
         servidor.createContext("/api/reservas", new ControladorReserva(servicioReservas, servicioAutenticacion));
+        servidor.createContext("/api/reservas/mis-reservas", new ControladorMisReservas(servicioReservas, servicioAutenticacion));
+        servidor.createContext("/api/reservas/cancelar", new ControladorCancelarReserva(servicioReservas, servicioAutenticacion));
         servidor.createContext("/", new ControladorArchivosEstaticos(configuracion.raizWeb()));
         servidor.setExecutor(Executors.newCachedThreadPool());
 
@@ -248,6 +262,95 @@ public final class Aplicacion {
         }
     }
 
+    private static final class ControladorMisReservas implements HttpHandler {
+        private final ServicioReservas servicioReservas;
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorMisReservas(ServicioReservas servicioReservas, ServicioAutenticacion servicioAutenticacion) {
+            this.servicioReservas = servicioReservas;
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"GET".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Optional<UsuarioSesion> sesion = servicioAutenticacion.buscarPorToken(
+                    intercambio.getRequestHeaders().getFirst("X-Linea-Token")
+            );
+
+            if (sesion.isEmpty()) {
+                escribirJson(intercambio, 401, "{\"error\":\"Debes iniciar sesion para consultar tus reservas.\"}");
+                return;
+            }
+
+            String rol = sesion.get().rol();
+            if (!"registrado".equals(rol) && !"horeca".equals(rol) && !"maestro".equals(rol)) {
+                escribirJson(intercambio, 403, "{\"error\":\"Tu rol no tiene permiso para ver reservas.\"}");
+                return;
+            }
+
+            try {
+                escribirJson(intercambio, 200, servicioReservas.listarReservasCliente(sesion.get().idDni()));
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            }
+        }
+    }
+
+    private static final class ControladorCancelarReserva implements HttpHandler {
+        private final ServicioReservas servicioReservas;
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorCancelarReserva(ServicioReservas servicioReservas, ServicioAutenticacion servicioAutenticacion) {
+            this.servicioReservas = servicioReservas;
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"POST".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Optional<UsuarioSesion> sesion = servicioAutenticacion.buscarPorToken(
+                    intercambio.getRequestHeaders().getFirst("X-Linea-Token")
+            );
+
+            if (sesion.isEmpty()) {
+                escribirJson(intercambio, 401, "{\"error\":\"Debes iniciar sesion para cancelar una reserva.\"}");
+                return;
+            }
+
+            String rol = sesion.get().rol();
+            if (!"registrado".equals(rol) && !"horeca".equals(rol) && !"maestro".equals(rol)) {
+                escribirJson(intercambio, 403, "{\"error\":\"Tu rol no tiene permiso para cancelar reservas.\"}");
+                return;
+            }
+
+            Map<String, String> cuerpo = analizarCuerpo(intercambio);
+            int idReserva = analizarEntero(cuerpo.get("idReserva"), -1);
+            if (idReserva < 1) {
+                escribirJson(intercambio, 400, "{\"error\":\"Falta un idReserva valido.\"}");
+                return;
+            }
+
+            try {
+                escribirJson(intercambio, 200, servicioReservas.cancelarReserva(idReserva, sesion.get().idDni()));
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            }
+        }
+    }
+
     private static final class ControladorDisponibilidad implements HttpHandler {
         private final ServicioReservas servicioReservas;
         private final ServicioAutenticacion servicioAutenticacion;
@@ -338,6 +441,7 @@ public final class Aplicacion {
             byte[] cuerpo = Files.readAllBytes(destino);
             Headers cabeceras = intercambio.getResponseHeaders();
             cabeceras.set("Content-Type", obtenerTipoContenido(destino));
+            aplicarCabecerasSinCache(cabeceras);
             intercambio.sendResponseHeaders(200, cuerpo.length);
 
             try (OutputStream salida = intercambio.getResponseBody()) {
@@ -407,10 +511,17 @@ public final class Aplicacion {
         byte[] cuerpo = json.getBytes(StandardCharsets.UTF_8);
         Headers cabeceras = intercambio.getResponseHeaders();
         cabeceras.set("Content-Type", "application/json; charset=utf-8");
+        aplicarCabecerasSinCache(cabeceras);
         intercambio.sendResponseHeaders(estado, cuerpo.length);
 
         try (OutputStream salida = intercambio.getResponseBody()) {
             salida.write(cuerpo);
         }
+    }
+
+    private static void aplicarCabecerasSinCache(Headers cabeceras) {
+        cabeceras.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        cabeceras.set("Pragma", "no-cache");
+        cabeceras.set("Expires", "0");
     }
 }

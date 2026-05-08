@@ -365,6 +365,8 @@ Tablas relevantes:
 - `POST /api/admin/clientes-horeca`
 - `GET /api/disponibilidad`
 - `POST /api/reservas`
+- `GET /api/reservas/mis-reservas`
+- `POST /api/reservas/cancelar`
 
 ## 8. Reglas de Acceso y Validación
 

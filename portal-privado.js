@@ -1,17 +1,20 @@
-const botonCerrarSesion = document.querySelector("#logout-button");
-const formularioReserva = document.querySelector("#booking-form");
-const campoFechaEntrada = document.querySelector("#checkin");
-const campoFechaSalida = document.querySelector("#checkout");
-const campoHuespedes = document.querySelector("#guests");
-const tarjetaDisponibilidad = document.querySelector("#availability-card");
-const botonConfirmarReserva = document.querySelector("#booking-confirm");
-const resumenReserva = document.querySelector("#booking-summary");
-const estadoSesion = document.querySelector("#session-status");
-const tituloPrivado = document.querySelector("#private-page-title");
-const nombrePrivado = document.querySelector("#private-user-name");
-const textoPrivado = document.querySelector("#private-user-copy");
-const formularioHoreca = document.querySelector("#horeca-form");
-const estadoHoreca = document.querySelector("#horeca-status");
+const botonCerrarSesion = document.querySelector("#boton-cerrar-sesion");
+const formularioReserva = document.querySelector("#formulario-reserva");
+const campoFechaEntrada = document.querySelector("#fecha-entrada");
+const campoFechaSalida = document.querySelector("#fecha-salida");
+const campoHuespedes = document.querySelector("#huespedes");
+const tarjetaDisponibilidad = document.querySelector("#tarjeta-disponibilidad");
+const botonConfirmarReserva = document.querySelector("#boton-confirmar-reserva");
+const resumenReserva = document.querySelector("#resumen-reserva");
+const estadoSesion = document.querySelector("#estado-sesion");
+const tituloPrivado = document.querySelector("#titulo-pagina-privada");
+const nombrePrivado = document.querySelector("#nombre-usuario-privado");
+const textoPrivado = document.querySelector("#texto-usuario-privado");
+const formularioHoreca = document.querySelector("#formulario-horeca");
+const estadoHoreca = document.querySelector("#estado-horeca");
+const botonActualizarReservas = document.querySelector("#boton-actualizar-reservas");
+const estadoReservas = document.querySelector("#estado-reservas");
+const historialReservas = document.querySelector("#historial-reservas");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
 let sesionActiva = cargarSesion();
@@ -27,8 +30,14 @@ formularioReserva.addEventListener("submit", async (evento) => {
     }
 
     try {
+        const parametros = new URLSearchParams({
+            fechaEntrada: campoFechaEntrada.value,
+            fechaSalida: campoFechaSalida.value,
+            huespedes: campoHuespedes.value
+        });
+
         const respuesta = await fetch(
-            `/api/disponibilidad?fechaEntrada=${campoFechaEntrada.value}&fechaSalida=${campoFechaSalida.value}&huespedes=${campoHuespedes.value}`,
+            `/api/disponibilidad?${parametros.toString()}`,
             {
                 headers: {
                     "Accept": "application/json",
@@ -42,7 +51,7 @@ formularioReserva.addEventListener("submit", async (evento) => {
             return;
         }
 
-        const datos = await respuesta.json();
+        const datos = await leerRespuestaJson(respuesta);
 
         if (!respuesta.ok) {
             throw new Error(datos.error || "No se pudo consultar la disponibilidad real.");
@@ -91,7 +100,7 @@ botonConfirmarReserva.addEventListener("click", async () => {
             return;
         }
 
-        const datos = await respuesta.json();
+        const datos = await leerRespuestaJson(respuesta);
 
         if (!respuesta.ok) {
             throw new Error(datos.error || "No se pudo crear la reserva.");
@@ -111,6 +120,7 @@ botonConfirmarReserva.addEventListener("click", async () => {
 
         ultimaDisponibilidad = null;
         actualizarBotonReserva();
+        cargarMisReservas();
     } catch (error) {
         renderizarDisponibilidad("No se pudo confirmar", error.message || "La reserva no pudo registrarse.", "aviso");
     } finally {
@@ -128,14 +138,14 @@ if (formularioHoreca) {
         evento.preventDefault();
 
         const datosFormulario = {
-            empresa: document.querySelector("#horeca-company").value.trim(),
+            empresa: document.querySelector("#horeca-empresa").value.trim(),
             cif: document.querySelector("#horeca-cif").value.trim(),
-            nombreContacto: document.querySelector("#horeca-name").value.trim(),
-            apellidoContacto: document.querySelector("#horeca-surname").value.trim(),
-            documento: document.querySelector("#horeca-document").value.trim(),
-            correo: document.querySelector("#horeca-email").value.trim(),
-            telefono: document.querySelector("#horeca-phone").value.trim(),
-            contrasena: document.querySelector("#horeca-password").value.trim()
+            nombreContacto: document.querySelector("#horeca-nombre").value.trim(),
+            apellidoContacto: document.querySelector("#horeca-apellido").value.trim(),
+            documento: document.querySelector("#horeca-documento").value.trim(),
+            correo: document.querySelector("#horeca-correo").value.trim(),
+            telefono: document.querySelector("#horeca-telefono").value.trim(),
+            contrasena: document.querySelector("#horeca-contrasena").value.trim()
         };
 
         if (!/^[A-Za-z0-9]{1,12}$/.test(datosFormulario.contrasena)) {
@@ -144,7 +154,7 @@ if (formularioHoreca) {
                 "Contrasena no valida",
                 "La contrasena inicial debe tener un maximo de 12 caracteres alfanumericos."
             );
-            document.querySelector("#horeca-password").focus();
+            document.querySelector("#horeca-contrasena").focus();
             return;
         }
 
@@ -164,7 +174,7 @@ if (formularioHoreca) {
                 return;
             }
 
-            const datos = await respuesta.json();
+            const datos = await leerRespuestaJson(respuesta);
 
             if (!respuesta.ok) {
                 throw new Error(datos.error || "No se pudo crear el cliente HORECA.");
@@ -183,6 +193,12 @@ if (formularioHoreca) {
                 error.message || "No se ha podido registrar el cliente HORECA."
             );
         }
+    });
+}
+
+if (botonActualizarReservas) {
+    botonActualizarReservas.addEventListener("click", () => {
+        cargarMisReservas();
     });
 }
 
@@ -211,10 +227,11 @@ async function inicializarPortalPrivado() {
     localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(sesionActiva));
     protegerPagina();
     configurarFechas();
+    configurarHistoricoReservas();
 }
 
 function protegerPagina() {
-    const tipoPagina = document.body.dataset.privatePage;
+    const tipoPagina = document.body.dataset.paginaPrivada;
 
     if (!sesionActiva) {
         window.location.href = "acceso.html";
@@ -262,6 +279,135 @@ function redirigirSegunPerfil(rol) {
     window.location.href = "acceso.html";
 }
 
+function configurarHistoricoReservas() {
+    if (!historialReservas || document.body.dataset.paginaPrivada !== "cliente") {
+        return;
+    }
+
+    cargarMisReservas();
+}
+
+async function cargarMisReservas() {
+    if (!sesionActiva?.token || !historialReservas || !estadoReservas) {
+        return;
+    }
+
+    renderizarEstadoReservas("bloqueado", "Cargando reservas", "Consultando el historico real asociado al cliente.");
+
+    try {
+        const respuesta = await fetch("/api/reservas/mis-reservas", {
+            headers: {
+                "Accept": "application/json",
+                "X-Linea-Token": sesionActiva.token
+            }
+        });
+
+        if (respuesta.status === 401) {
+            cerrarSesionPorExpiracion();
+            return;
+        }
+
+        const datos = await leerRespuestaJson(respuesta);
+
+        if (!respuesta.ok) {
+            throw new Error(datos.error || "No se pudo cargar el historico de reservas.");
+        }
+
+        renderizarListaReservas(datos.reservas || []);
+        renderizarEstadoReservas(
+            "disponible",
+            "Historico cargado",
+            `Se han localizado ${datos.total || 0} reservas vinculadas a tu usuario.`
+        );
+    } catch (error) {
+        renderizarEstadoReservas(
+            "aviso",
+            "No se pudo cargar el historico",
+            error.message || "Intentalo de nuevo en unos segundos."
+        );
+        historialReservas.innerHTML = "";
+    }
+}
+
+function renderizarListaReservas(reservas) {
+    if (!historialReservas) {
+        return;
+    }
+
+    if (!Array.isArray(reservas) || reservas.length === 0) {
+        historialReservas.innerHTML = `
+            <article class="history-card history-card-empty">
+                <strong>No hay reservas registradas</strong>
+                <p>Todavia no existen estancias vinculadas a este usuario.</p>
+            </article>
+        `;
+        return;
+    }
+
+    historialReservas.innerHTML = reservas.map((reserva) => {
+        const estadoNormalizado = String(reserva.estado || "").toLowerCase();
+        const puedeCancelar = estadoNormalizado === "confirmada" && esReservaFutura(reserva.fechaEntrada);
+        const botonCancelar = puedeCancelar
+            ? `<button class="button button-secondary history-action" type="button" data-action="cancelar-reserva" data-id-reserva="${reserva.idReserva}">Cancelar reserva</button>`
+            : "";
+
+        return `
+            <article class="history-card" data-reserva="${reserva.idReserva}">
+                <p class="availability-label">Reserva ${reserva.idReserva}</p>
+                <h3>${reserva.fechaEntrada} al ${reserva.fechaSalida}</h3>
+                <p class="history-meta">Estado: ${reserva.estado} · Habitacion: ${reserva.habitacionAsignada ?? "Sin asignar"} · Importe: ${formatearImporte(reserva.importeTotal) || "Pendiente"}</p>
+                ${botonCancelar}
+            </article>
+        `;
+    }).join("");
+
+    historialReservas.querySelectorAll("[data-action='cancelar-reserva']").forEach((boton) => {
+        boton.addEventListener("click", () => cancelarReservaCliente(boton.dataset.idReserva));
+    });
+}
+
+async function cancelarReservaCliente(idReserva) {
+    if (!idReserva || !sesionActiva?.token) {
+        return;
+    }
+
+    renderizarEstadoReservas("bloqueado", "Cancelando reserva", `Procesando la cancelacion de la reserva ${idReserva}.`);
+
+    try {
+        const respuesta = await fetch("/api/reservas/cancelar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-Linea-Token": sesionActiva.token
+            },
+            body: JSON.stringify({
+                idReserva: Number(idReserva)
+            })
+        });
+
+        if (respuesta.status === 401) {
+            cerrarSesionPorExpiracion();
+            return;
+        }
+
+        const datos = await leerRespuestaJson(respuesta);
+
+        if (!respuesta.ok) {
+            throw new Error(datos.error || "No se pudo cancelar la reserva.");
+        }
+
+        renderizarEstadoReservas("disponible", datos.titulo || "Reserva cancelada", datos.mensaje);
+        cargarMisReservas();
+    } catch (error) {
+        renderizarEstadoReservas(
+            "aviso",
+            "No se pudo cancelar",
+            error.message || "La reserva no ha podido cancelarse."
+        );
+    }
+}
+
 async function validarSesionEnServidor(token) {
     try {
         const respuesta = await fetch("/api/sesion/validar", {
@@ -275,9 +421,24 @@ async function validarSesionEnServidor(token) {
             return null;
         }
 
-        return await respuesta.json();
+        return await leerRespuestaJson(respuesta);
     } catch {
         return null;
+    }
+}
+
+async function leerRespuestaJson(respuesta) {
+    const tipoContenido = respuesta.headers.get("Content-Type") || "";
+    const cuerpoTexto = await respuesta.text();
+
+    if (!tipoContenido.includes("application/json")) {
+        throw new Error("El servidor no ha devuelto una respuesta JSON valida. Recarga la web e intentalo de nuevo.");
+    }
+
+    try {
+        return JSON.parse(cuerpoTexto);
+    } catch {
+        throw new Error("La respuesta del servidor no se ha podido interpretar correctamente.");
     }
 }
 
@@ -376,4 +537,26 @@ function renderizarEstadoHoreca(estado, titulo, texto) {
         <strong class="availability-title">${titulo}</strong>
         <p class="availability-text">${texto}</p>
     `;
+}
+
+function renderizarEstadoReservas(estado, titulo, texto) {
+    if (!estadoReservas) {
+        return;
+    }
+
+    estadoReservas.dataset.state = estado;
+    estadoReservas.innerHTML = `
+        <p class="availability-label">Estado de reservas</p>
+        <strong class="availability-title">${titulo}</strong>
+        <p class="availability-text">${texto}</p>
+    `;
+}
+
+function esReservaFutura(fechaEntrada) {
+    if (!fechaEntrada) {
+        return false;
+    }
+
+    const hoyIso = new Date().toISOString().split("T")[0];
+    return fechaEntrada > hoyIso;
 }

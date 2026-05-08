@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body data-private-page="cliente">
+<body data-pagina-privada="cliente">
     <header class="site-header">
         <a class="brand" href="index.html" aria-label="Inicio Linea Cano">
             <img class="brand-logo" src="imagenes/Logo_LineaCano.jpg" alt="Logo de Linea Cano">
@@ -22,25 +22,25 @@
             <a href="index.html">Web publica</a>
         </nav>
 
-        <button class="header-cta private-logout" id="logout-button" type="button">Cerrar sesion</button>
+        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesion</button>
     </header>
 
     <main class="private-shell" id="panel">
         <section class="section private-hero">
             <div class="section-heading">
                 <p class="eyebrow">Area cliente</p>
-                <h2 id="private-page-title">Tu estancia empieza aqui: disponibilidad real, reserva y siguientes servicios.</h2>
+                <h2 id="titulo-pagina-privada">Tu estancia empieza aqui: disponibilidad real, reserva y siguientes servicios.</h2>
             </div>
 
             <div class="private-grid">
                 <article class="private-card private-card-dark">
                     <span class="role-kicker">Sesion activa</span>
-                    <h3 id="private-user-name">Cliente registrado</h3>
-                    <p class="auth-copy" id="private-user-copy">
+                    <h3 id="nombre-usuario-privado">Cliente registrado</h3>
+                    <p class="auth-copy" id="texto-usuario-privado">
                         Desde este frontal puedes consultar el inventario real y confirmar tu reserva en la finca.
                     </p>
 
-                    <div class="session-status" id="session-status" data-state="registrado">
+                    <div class="session-status" id="estado-sesion" data-state="registrado">
                         <p class="availability-label">Estado de acceso</p>
                         <strong class="availability-title">Acceso autorizado</strong>
                         <p class="availability-text">La sesion del cliente esta lista para operar con disponibilidad real.</p>
@@ -85,18 +85,18 @@
                         <h3>Motor de reserva</h3>
                     </div>
 
-                    <form class="booking-form" id="booking-form">
+                    <form class="booking-form" id="formulario-reserva">
                         <label>
                             Llegada
-                            <input id="checkin" name="checkin" type="date" required>
+                            <input id="fecha-entrada" name="fechaEntrada" type="date" required>
                         </label>
                         <label>
                             Salida
-                            <input id="checkout" name="checkout" type="date" required>
+                            <input id="fecha-salida" name="fechaSalida" type="date" required>
                         </label>
                         <label>
                             Huespedes
-                            <select id="guests" name="guests">
+                            <select id="huespedes" name="huespedes">
                                 <option value="2">2 huespedes</option>
                                 <option value="4">4 huespedes</option>
                                 <option value="6">6 huespedes</option>
@@ -104,16 +104,16 @@
                             </select>
                         </label>
                         <button class="button button-primary booking-submit" type="submit">Consultar disponibilidad</button>
-                        <button class="button button-secondary booking-submit booking-confirm is-hidden" id="booking-confirm" type="button">Confirmar reserva</button>
+                        <button class="button button-secondary booking-submit booking-confirm is-hidden" id="boton-confirmar-reserva" type="button">Confirmar reserva</button>
                     </form>
 
-                    <div class="availability-card" id="availability-card" aria-live="polite">
+                    <div class="availability-card" id="tarjeta-disponibilidad" aria-live="polite">
                         <p class="availability-label">Estado actual</p>
                         <strong class="availability-title">Zona privada lista</strong>
                         <p class="availability-text">Selecciona fechas para consultar la disponibilidad real.</p>
                     </div>
 
-                    <div class="management-preview" id="booking-summary">
+                    <div class="management-preview" id="resumen-reserva">
                         <article>
                             <span>Habitaciones libres</span>
                             <strong>Sin consulta</strong>
@@ -129,6 +129,35 @@
                     </div>
                 </aside>
             </div>
+        </section>
+
+        <section class="section">
+            <div class="section-heading">
+                <p class="eyebrow">Mis reservas</p>
+                <h2>Consulta las reservas ya registradas y cancela las futuras desde tu area privada.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card">
+                    <span class="role-kicker">Historico</span>
+                    <h3>Tus estancias confirmadas quedan visibles en este resumen operativo.</h3>
+                    <p class="private-text">
+                        Esta seccion permite revisar fechas, estado, habitacion asignada e importe estimado de cada reserva
+                        vinculada a tu usuario.
+                    </p>
+                    <button class="button button-secondary booking-submit" id="boton-actualizar-reservas" type="button">Actualizar mis reservas</button>
+                </article>
+
+                <article class="private-card">
+                    <div class="availability-card" id="estado-reservas" data-state="bloqueado">
+                        <p class="availability-label">Estado de reservas</p>
+                        <strong class="availability-title">Pendiente de consulta</strong>
+                        <p class="availability-text">Pulsa en actualizar para cargar el historico del cliente autenticado.</p>
+                    </div>
+                </article>
+            </div>
+
+            <div class="reservation-history" id="historial-reservas" aria-live="polite"></div>
         </section>
     </main>
 

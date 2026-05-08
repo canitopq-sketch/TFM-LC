@@ -3,10 +3,19 @@ package com.lineacano.servidor;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utilidades minimas para construir y leer JSON simple sin dependencias externas.
+ */
 public final class UtilJson {
     private UtilJson() {
     }
 
+    /**
+     * Escapa caracteres conflictivos para insertar valores seguros en cadenas JSON.
+     *
+     * @param valor texto original
+     * @return texto escapado, o cadena vacia si el valor es nulo
+     */
     public static String escapar(String valor) {
         if (valor == null) {
             return "";
@@ -19,6 +28,12 @@ public final class UtilJson {
                 .replace("\r", "\\r");
     }
 
+    /**
+     * Interpreta un objeto JSON plano con claves y valores de texto.
+     *
+     * @param json cuerpo recibido por la API
+     * @return mapa de claves y valores extraidos
+     */
     public static Map<String, String> analizarObjetoSimple(String json) {
         Map<String, String> valores = new HashMap<>();
 
