@@ -10,6 +10,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Servicio de negocio para disponibilidad, creacion, listado y cancelacion de reservas.
+ */
 public final class ServicioReservas {
     private static final String SQL_TOTAL_HABITACIONES = "SELECT COUNT(*) FROM habitacion";
     private static final String SQL_HABITACIONES_RESERVADAS = """
@@ -61,10 +64,24 @@ public final class ServicioReservas {
 
     private final BaseDeDatos baseDeDatos;
 
+    /**
+     * Crea el servicio usando el gestor de base de datos compartido.
+     *
+     * @param baseDeDatos acceso JDBC a las tablas de habitaciones y reservas
+     */
     public ServicioReservas(BaseDeDatos baseDeDatos) {
         this.baseDeDatos = baseDeDatos;
     }
 
+    /**
+     * Comprueba el inventario disponible para un rango de fechas.
+     *
+     * @param fechaEntrada fecha de llegada
+     * @param fechaSalida fecha de salida, posterior a la entrada
+     * @param huespedes numero de huespedes solicitado
+     * @return resumen de disponibilidad consumido por el frontend
+     * @throws SQLException si falla la consulta a base de datos
+     */
     public ResultadoDisponibilidad comprobarDisponibilidad(LocalDate fechaEntrada, LocalDate fechaSalida, int huespedes)
             throws SQLException {
         if (!fechaSalida.isAfter(fechaEntrada)) {
@@ -110,6 +127,16 @@ public final class ServicioReservas {
         );
     }
 
+    /**
+     * Crea una reserva confirmada y asigna la primera habitacion libre.
+     *
+     * @param fechaEntrada fecha de llegada
+     * @param fechaSalida fecha de salida, posterior a la entrada
+     * @param huespedes numero de huespedes indicado en la reserva
+     * @param idDni identificador del cliente autenticado
+     * @return JSON con identificador, habitacion asignada e importe estimado
+     * @throws SQLException si falla la transaccion de insercion
+     */
     public String crearReserva(LocalDate fechaEntrada, LocalDate fechaSalida, int huespedes, String idDni)
             throws SQLException {
         if (idDni == null || idDni.isBlank()) {
@@ -167,6 +194,13 @@ public final class ServicioReservas {
         }
     }
 
+    /**
+     * Lista las reservas asociadas a un cliente autenticado.
+     *
+     * @param idDni identificador del cliente
+     * @return JSON con el total y el detalle de reservas localizadas
+     * @throws SQLException si falla la consulta de reservas
+     */
     public String listarReservasCliente(String idDni) throws SQLException {
         if (idDni == null || idDni.isBlank()) {
             throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado.");
@@ -212,6 +246,14 @@ public final class ServicioReservas {
         );
     }
 
+    /**
+     * Cancela una reserva futura perteneciente al cliente autenticado.
+     *
+     * @param idReserva identificador de la reserva a cancelar
+     * @param idDni identificador del cliente propietario de la reserva
+     * @return JSON de confirmacion de cancelacion
+     * @throws SQLException si falla la lectura o actualizacion de la reserva
+     */
     public String cancelarReserva(int idReserva, String idDni) throws SQLException {
         if (idDni == null || idDni.isBlank()) {
             throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado.");

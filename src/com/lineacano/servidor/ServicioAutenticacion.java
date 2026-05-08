@@ -11,6 +11,9 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Servicio de negocio para autenticacion, sesiones persistentes y altas de usuarios.
+ */
 public final class ServicioAutenticacion {
     private static final Duration DURACION_MAXIMA_SESION = Duration.ofDays(7);
     private static final String SQL_INICIO_SESION = """
@@ -91,6 +94,11 @@ public final class ServicioAutenticacion {
 
     private final BaseDeDatos baseDeDatos;
 
+    /**
+     * Crea el servicio y asegura la tabla de sesiones necesaria para validar tokens.
+     *
+     * @param baseDeDatos acceso JDBC compartido por la aplicacion
+     */
     public ServicioAutenticacion(BaseDeDatos baseDeDatos) {
         this.baseDeDatos = baseDeDatos;
         try {
@@ -100,6 +108,14 @@ public final class ServicioAutenticacion {
         }
     }
 
+    /**
+     * Valida credenciales y registra una nueva sesion persistente.
+     *
+     * @param usuario correo de acceso
+     * @param contrasena contrasena en texto plano introducida por el usuario
+     * @return datos de sesion que se devuelven al frontend
+     * @throws SQLException si falla la consulta o el registro de sesion
+     */
     public UsuarioSesion iniciarSesion(String usuario, String contrasena) throws SQLException {
         if (usuario == null || usuario.isBlank() || contrasena == null || contrasena.isBlank()) {
             throw new IllegalArgumentException("Usuario y contraseña son obligatorios.");
@@ -163,6 +179,12 @@ public final class ServicioAutenticacion {
         }
     }
 
+    /**
+     * Busca y valida una sesion a partir del token recibido por cabecera.
+     *
+     * @param token token enviado por el frontend
+     * @return sesion valida, o vacio si el token no existe, ha caducado o el usuario esta inactivo
+     */
     public Optional<UsuarioSesion> buscarPorToken(String token) {
         if (token == null || token.isBlank()) {
             return Optional.empty();
@@ -211,6 +233,18 @@ public final class ServicioAutenticacion {
         }
     }
 
+    /**
+     * Registra un nuevo usuario con rol de cliente registrado.
+     *
+     * @param documento DNI o documento identificativo
+     * @param nombre nombre del cliente
+     * @param apellido primer apellido del cliente
+     * @param correo correo de acceso
+     * @param telefono telefono opcional
+     * @param contrasena contrasena inicial
+     * @return JSON de confirmacion del alta
+     * @throws SQLException si falla la transaccion de alta
+     */
     public String registrarNuevoUsuario(
             String documento,
             String nombre,
@@ -276,6 +310,20 @@ public final class ServicioAutenticacion {
         }
     }
 
+    /**
+     * Da de alta un cliente profesional HORECA desde el perfil maestro.
+     *
+     * @param documento DNI del contacto profesional
+     * @param nombreContacto nombre del contacto
+     * @param apellidoContacto primer apellido del contacto
+     * @param empresa nombre comercial de la empresa
+     * @param cif identificador fiscal de la empresa
+     * @param correo correo profesional de acceso
+     * @param telefono telefono opcional de contacto
+     * @param contrasena contrasena inicial
+     * @return JSON de confirmacion del alta HORECA
+     * @throws SQLException si falla la transaccion de alta
+     */
     public String altaClienteHoreca(
             String documento,
             String nombreContacto,

@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body data-private-page="comercial">
+<body data-pagina-privada="comercial">
     <header class="site-header">
         <a class="brand" href="index.html" aria-label="Inicio Linea Cano">
             <img class="brand-logo" src="imagenes/Logo_LineaCano.jpg" alt="Logo de Linea Cano">
@@ -22,25 +22,25 @@
             <a href="index.html">Web publica</a>
         </nav>
 
-        <button class="header-cta private-logout" id="logout-button" type="button">Cerrar sesion</button>
+        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesion</button>
     </header>
 
     <main class="private-shell" id="panel">
         <section class="section private-hero">
             <div class="section-heading">
                 <p class="eyebrow">Area comercial</p>
-                <h2 id="private-page-title">Consulta operativa, reservas y siguiente capa de gestion comercial.</h2>
+                <h2 id="titulo-pagina-privada">Consulta operativa, reservas y siguiente capa de gestion comercial.</h2>
             </div>
 
             <div class="private-grid">
                 <article class="private-card private-card-dark">
                     <span class="role-kicker">Sesion activa</span>
-                    <h3 id="private-user-name">Perfil comercial</h3>
-                    <p class="auth-copy" id="private-user-copy">
+                    <h3 id="nombre-usuario-privado">Perfil comercial</h3>
+                    <p class="auth-copy" id="texto-usuario-privado">
                         Este frontal prepara el salto a agenda, eventos, HORECA y seguimiento de oportunidades.
                     </p>
 
-                    <div class="session-status" id="session-status" data-state="maestro">
+                    <div class="session-status" id="estado-sesion" data-state="maestro">
                         <p class="availability-label">Estado de acceso</p>
                         <strong class="availability-title">Acceso comercial autorizado</strong>
                         <p class="availability-text">La sesion comercial puede consultar ocupacion y confirmar reservas.</p>
@@ -85,18 +85,18 @@
                         <h3>Disponibilidad y reserva</h3>
                     </div>
 
-                    <form class="booking-form" id="booking-form">
+                    <form class="booking-form" id="formulario-reserva">
                         <label>
                             Llegada
-                            <input id="checkin" name="checkin" type="date" required>
+                            <input id="fecha-entrada" name="fechaEntrada" type="date" required>
                         </label>
                         <label>
                             Salida
-                            <input id="checkout" name="checkout" type="date" required>
+                            <input id="fecha-salida" name="fechaSalida" type="date" required>
                         </label>
                         <label>
                             Huespedes
-                            <select id="guests" name="guests">
+                            <select id="huespedes" name="huespedes">
                                 <option value="2">2 huespedes</option>
                                 <option value="4">4 huespedes</option>
                                 <option value="6">6 huespedes</option>
@@ -104,16 +104,16 @@
                             </select>
                         </label>
                         <button class="button button-primary booking-submit" type="submit">Consultar disponibilidad</button>
-                        <button class="button button-secondary booking-submit booking-confirm is-hidden" id="booking-confirm" type="button">Confirmar reserva</button>
+                        <button class="button button-secondary booking-submit booking-confirm is-hidden" id="boton-confirmar-reserva" type="button">Confirmar reserva</button>
                     </form>
 
-                    <div class="availability-card" id="availability-card" aria-live="polite">
+                    <div class="availability-card" id="tarjeta-disponibilidad" aria-live="polite">
                         <p class="availability-label">Estado actual</p>
                         <strong class="availability-title">Area comercial lista</strong>
                         <p class="availability-text">Selecciona fechas para consultar ocupacion real y avanzar con la reserva.</p>
                     </div>
 
-                    <div class="management-preview" id="booking-summary">
+                    <div class="management-preview" id="resumen-reserva">
                         <article>
                             <span>Habitaciones libres</span>
                             <strong>Sin consulta</strong>
@@ -146,10 +146,10 @@
                         profesional HORECA dentro de la base de datos.
                     </p>
 
-                    <form class="register-form" id="horeca-form">
+                    <form class="register-form" id="formulario-horeca">
                         <label>
                             Empresa
-                            <input id="horeca-company" type="text" placeholder="Nombre de la empresa" required>
+                            <input id="horeca-empresa" type="text" placeholder="Nombre de la empresa" required>
                         </label>
                         <label>
                             CIF
@@ -157,28 +157,28 @@
                         </label>
                         <label>
                             Nombre de contacto
-                            <input id="horeca-name" type="text" placeholder="Nombre" required>
+                            <input id="horeca-nombre" type="text" placeholder="Nombre" required>
                         </label>
                         <label>
                             Primer apellido
-                            <input id="horeca-surname" type="text" placeholder="Primer apellido" required>
+                            <input id="horeca-apellido" type="text" placeholder="Primer apellido" required>
                         </label>
                         <label>
                             DNI del contacto
-                            <input id="horeca-document" type="text" placeholder="12345678A" maxlength="20" required>
+                            <input id="horeca-documento" type="text" placeholder="12345678A" maxlength="20" required>
                         </label>
                         <label>
                             Correo profesional
-                            <input id="horeca-email" type="email" placeholder="compras@empresa.com" required>
+                            <input id="horeca-correo" type="email" placeholder="compras@empresa.com" required>
                         </label>
                         <label>
                             Telefono
-                            <input id="horeca-phone" type="tel" placeholder="+34 600 000 000">
+                            <input id="horeca-telefono" type="tel" placeholder="+34 600 000 000">
                         </label>
                         <label>
                             Contrasena inicial
                             <input
-                                id="horeca-password"
+                                id="horeca-contrasena"
                                 type="password"
                                 placeholder="Maximo 12 caracteres"
                                 maxlength="12"
@@ -199,7 +199,7 @@
                         siguiente evolucion funcional.
                     </p>
 
-                    <div class="availability-card" id="horeca-status" data-state="bloqueado">
+                    <div class="availability-card" id="estado-horeca" data-state="bloqueado">
                         <p class="availability-label">Cliente HORECA</p>
                         <strong class="availability-title">Esperando datos de alta</strong>
                         <p class="availability-text">Introduce los datos del profesional para crear su acceso desde el panel maestro.</p>

@@ -42,15 +42,15 @@
                         especifico de seguimiento, consulta y operativa inicial.
                     </p>
 
-                    <form class="auth-form" id="auth-form">
+                    <form class="auth-form" id="formulario-acceso">
                         <label>
                             Correo de acceso
-                            <input id="auth-username" name="usuario" type="text" placeholder="cliente@lineacano.com" required>
+                            <input id="usuario-acceso" name="usuario" type="text" placeholder="cliente@lineacano.com" required>
                         </label>
                         <label>
                             Contrasena
                             <input
-                                id="auth-password"
+                                id="contrasena-acceso"
                                 name="contrasena"
                                 type="password"
                                 placeholder="cliente123"
@@ -63,7 +63,7 @@
                         <button class="button button-primary" type="submit">Entrar</button>
                     </form>
 
-                    <div class="session-status" id="session-status" data-state="publico">
+                    <div class="session-status" id="estado-acceso" data-state="publico">
                         <p class="availability-label">Estado de acceso</p>
                         <strong class="availability-title">Esperando autenticacion</strong>
                         <p class="availability-text">Introduce tus credenciales para redirigirte al frontal correspondiente.</p>
@@ -78,31 +78,31 @@
                         queda reservada al panel de administracion para mantener el acceso segmentado.
                     </p>
 
-                    <form class="register-form" id="register-form">
+                    <form class="register-form" id="formulario-registro">
                         <label>
                             DNI o documento
-                            <input id="register-document" type="text" placeholder="12345678A" maxlength="20" required>
+                            <input id="registro-documento" type="text" placeholder="12345678A" maxlength="20" required>
                         </label>
                         <label>
                             Nombre
-                            <input id="register-name" type="text" placeholder="Nombre" required>
+                            <input id="registro-nombre" type="text" placeholder="Nombre" required>
                         </label>
                         <label>
                             Primer apellido
-                            <input id="register-surname" type="text" placeholder="Primer apellido" required>
+                            <input id="registro-apellido" type="text" placeholder="Primer apellido" required>
                         </label>
                         <label>
                             Correo
-                            <input id="register-email" type="email" placeholder="correo@ejemplo.com" required>
+                            <input id="registro-correo" type="email" placeholder="correo@ejemplo.com" required>
                         </label>
                         <label>
                             Telefono
-                            <input id="register-phone" type="tel" placeholder="+34 600 000 000">
+                            <input id="registro-telefono" type="tel" placeholder="+34 600 000 000">
                         </label>
                         <label>
                             Contrasena
                             <input
-                                id="register-password"
+                                id="registro-contrasena"
                                 type="password"
                                 placeholder="Maximo 12 caracteres"
                                 maxlength="12"
@@ -114,7 +114,7 @@
                         <button class="button button-secondary register-submit" type="submit">Crear cuenta</button>
                     </form>
 
-                    <div class="availability-card" id="register-status" data-state="bloqueado">
+                    <div class="availability-card" id="estado-registro" data-state="bloqueado">
                         <p class="availability-label">Registro</p>
                         <strong class="availability-title">Alta de cliente</strong>
                         <p class="availability-text">Rellena tus datos para crear una cuenta de cliente registrado en Linea Cano.</p>

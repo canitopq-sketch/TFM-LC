@@ -20,10 +20,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
+/**
+ * Punto de entrada del servidor HTTP ligero de Linea Cano.
+ *
+ * <p>Inicializa configuracion, conexion a base de datos, servicios de negocio y
+ * rutas publicas/API utilizadas por el prototipo funcional del TFM.</p>
+ */
 public final class Aplicacion {
     private Aplicacion() {
     }
 
+    /**
+     * Arranca el servidor web y registra los controladores de API y archivos estaticos.
+     *
+     * @param args argumentos de linea de comandos no utilizados
+     * @throws Exception si falla la carga de configuracion, la base de datos o el servidor HTTP
+     */
     public static void main(String[] args) throws Exception {
         // Carga la configuración y los servicios principales de la aplicación.
         Configuracion configuracion = Configuracion.cargar();
@@ -429,6 +441,7 @@ public final class Aplicacion {
             byte[] cuerpo = Files.readAllBytes(destino);
             Headers cabeceras = intercambio.getResponseHeaders();
             cabeceras.set("Content-Type", obtenerTipoContenido(destino));
+            aplicarCabecerasSinCache(cabeceras);
             intercambio.sendResponseHeaders(200, cuerpo.length);
 
             try (OutputStream salida = intercambio.getResponseBody()) {
@@ -498,10 +511,17 @@ public final class Aplicacion {
         byte[] cuerpo = json.getBytes(StandardCharsets.UTF_8);
         Headers cabeceras = intercambio.getResponseHeaders();
         cabeceras.set("Content-Type", "application/json; charset=utf-8");
+        aplicarCabecerasSinCache(cabeceras);
         intercambio.sendResponseHeaders(estado, cuerpo.length);
 
         try (OutputStream salida = intercambio.getResponseBody()) {
             salida.write(cuerpo);
         }
+    }
+
+    private static void aplicarCabecerasSinCache(Headers cabeceras) {
+        cabeceras.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        cabeceras.set("Pragma", "no-cache");
+        cabeceras.set("Expires", "0");
     }
 }

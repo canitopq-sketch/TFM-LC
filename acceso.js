@@ -1,15 +1,15 @@
-const formularioAcceso = document.querySelector("#auth-form");
-const campoUsuario = document.querySelector("#auth-username");
-const campoContrasena = document.querySelector("#auth-password");
-const estadoSesion = document.querySelector("#session-status");
-const formularioRegistro = document.querySelector("#register-form");
-const estadoRegistro = document.querySelector("#register-status");
-const campoRegistroDocumento = document.querySelector("#register-document");
-const campoRegistroNombre = document.querySelector("#register-name");
-const campoRegistroApellido = document.querySelector("#register-surname");
-const campoRegistroCorreo = document.querySelector("#register-email");
-const campoRegistroTelefono = document.querySelector("#register-phone");
-const campoRegistroContrasena = document.querySelector("#register-password");
+const formularioAcceso = document.querySelector("#formulario-acceso");
+const campoUsuario = document.querySelector("#usuario-acceso");
+const campoContrasena = document.querySelector("#contrasena-acceso");
+const estadoSesion = document.querySelector("#estado-acceso");
+const formularioRegistro = document.querySelector("#formulario-registro");
+const estadoRegistro = document.querySelector("#estado-registro");
+const campoRegistroDocumento = document.querySelector("#registro-documento");
+const campoRegistroNombre = document.querySelector("#registro-nombre");
+const campoRegistroApellido = document.querySelector("#registro-apellido");
+const campoRegistroCorreo = document.querySelector("#registro-correo");
+const campoRegistroTelefono = document.querySelector("#registro-telefono");
+const campoRegistroContrasena = document.querySelector("#registro-contrasena");
 
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
 
@@ -44,7 +44,7 @@ formularioAcceso.addEventListener("submit", async (evento) => {
             })
         });
 
-        const datos = await respuesta.json();
+        const datos = await leerRespuestaJson(respuesta);
 
         if (!respuesta.ok) {
             throw new Error(datos.error || "No se pudo iniciar sesion.");
@@ -96,7 +96,7 @@ formularioRegistro.addEventListener("submit", async (evento) => {
             })
         });
 
-        const datos = await respuesta.json();
+        const datos = await leerRespuestaJson(respuesta);
 
         if (!respuesta.ok) {
             throw new Error(datos.error || "No se pudo completar el registro.");
@@ -144,11 +144,26 @@ async function inicializarSesionGuardada() {
             throw new Error("La sesion ya no es valida.");
         }
 
-        const datos = await respuesta.json();
+        const datos = await leerRespuestaJson(respuesta);
         localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(datos));
         redirigirSegunPerfil(datos.rol);
     } catch {
         localStorage.removeItem(CLAVE_ALMACENAMIENTO);
+    }
+}
+
+async function leerRespuestaJson(respuesta) {
+    const tipoContenido = respuesta.headers.get("Content-Type") || "";
+    const cuerpoTexto = await respuesta.text();
+
+    if (!tipoContenido.includes("application/json")) {
+        throw new Error("El servidor no ha devuelto una respuesta JSON valida. Recarga la web e intentalo de nuevo.");
+    }
+
+    try {
+        return JSON.parse(cuerpoTexto);
+    } catch {
+        throw new Error("La respuesta del servidor no se ha podido interpretar correctamente.");
     }
 }
 

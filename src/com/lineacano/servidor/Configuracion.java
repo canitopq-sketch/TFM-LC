@@ -5,6 +5,18 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Properties;
 
+/**
+ * Valores de configuracion necesarios para iniciar la aplicacion.
+ *
+ * <p>Los datos se resuelven desde {@code config/application.properties}, con
+ * posibilidad de sobrescritura mediante variables de entorno.</p>
+ *
+ * @param puerto puerto HTTP del servidor
+ * @param raizWeb carpeta desde la que se sirven los archivos estaticos
+ * @param urlBaseDeDatos URL JDBC de MySQL
+ * @param usuarioBaseDeDatos usuario de conexion a MySQL
+ * @param contrasenaBaseDeDatos contrasena de conexion a MySQL
+ */
 public record Configuracion(
         int puerto,
         Path raizWeb,
@@ -12,6 +24,12 @@ public record Configuracion(
         String usuarioBaseDeDatos,
         String contrasenaBaseDeDatos
 ) {
+    /**
+     * Carga la configuracion desde fichero local y valores por defecto.
+     *
+     * @return configuracion completa para arrancar servidor y base de datos
+     * @throws IOException si falla la lectura del fichero de propiedades
+     */
     public static Configuracion cargar() throws IOException {
         // Se intenta leer el fichero local y, si falta algún valor, se usa el valor por defecto.
         Properties propiedades = new Properties();

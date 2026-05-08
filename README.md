@@ -117,7 +117,7 @@ Después abre:
 
 ## Ideas para siguientes iteraciones
 
-- CRUD de reservas
+- Edicion avanzada de reservas
 - Gestión de habitaciones y salones
 - Panel específico para clientes
 - Panel específico para maestro/comercial
