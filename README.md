@@ -37,8 +37,9 @@ Proyecto web con parte visual en HTML, CSS y JavaScript, y backend en Java para 
 ## Requisitos
 
 - Java 23 o compatible
+- Maven 3.9 o compatible (recomendado para compilar y ejecutar las pruebas)
 - MySQL local
-- Driver JDBC de MySQL
+- Driver JDBC de MySQL (Maven lo descarga automaticamente)
 
 En este equipo se ha localizado el driver en:
 
@@ -87,6 +88,13 @@ Este script importa:
 zsh scripts/run_backend.sh
 ```
 
+También se puede compilar y ejecutar el plan de pruebas de forma reproducible con Maven:
+
+```bash
+mvn clean test
+mvn javadoc:javadoc
+```
+
 Después abre:
 
 `http://localhost:8080`
@@ -100,6 +108,8 @@ Después abre:
 - `POST /api/reservas`
 - `GET /api/reservas/mis-reservas`
 - `POST /api/reservas/cancelar`
+- `POST /api/pedidos`
+- `GET /api/pedidos/mis-pedidos`
 
 ### Ejemplo de login JSON
 

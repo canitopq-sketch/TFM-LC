@@ -121,9 +121,7 @@ public final class ServicioAutenticacion {
             throw new IllegalArgumentException("Usuario y contraseña son obligatorios.");
         }
 
-        if (!contrasena.matches("[A-Za-z0-9]{1,10}")) {
-            throw new IllegalArgumentException("La contraseña debe tener un maximo de 10 caracteres alfanumericos.");
-        }
+        ReglasNegocio.validarContrasena(contrasena);
 
         // Se normaliza el correo para evitar diferencias por mayúsculas o espacios.
         String correoNormalizado = usuario.trim().toLowerCase();
@@ -504,9 +502,7 @@ public final class ServicioAutenticacion {
             throw new IllegalArgumentException("La contraseña es obligatoria.");
         }
 
-        if (!contrasena.matches("[A-Za-z0-9]{1,10}")) {
-            throw new IllegalArgumentException("La contraseña debe tener un maximo de 10 caracteres alfanumericos.");
-        }
+        ReglasNegocio.validarContrasena(contrasena);
     }
 
     private void validarDocumento(String documento, String mensajeError) {

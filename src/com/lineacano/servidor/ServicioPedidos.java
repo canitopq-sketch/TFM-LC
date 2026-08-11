@@ -74,6 +74,11 @@ public final class ServicioPedidos {
 
     private final BaseDeDatos baseDeDatos;
 
+    /**
+     * Crea el servicio y asegura las tablas necesarias para guardar pedidos.
+     *
+     * @param baseDeDatos acceso JDBC compartido por la aplicacion
+     */
     public ServicioPedidos(BaseDeDatos baseDeDatos) {
         this.baseDeDatos = baseDeDatos;
         try {
@@ -83,6 +88,15 @@ public final class ServicioPedidos {
         }
     }
 
+    /**
+     * Registra un pedido y sus lineas dentro de una unica transaccion.
+     *
+     * @param idDni cliente autenticado que realiza el pedido
+     * @param rol rol que determina el canal particular o HORECA
+     * @param lineasBrutas codigos y cantidades enviados por el formulario
+     * @return confirmacion JSON del pedido creado
+     * @throws SQLException si falla la operacion contra MySQL
+     */
     public String crearPedido(String idDni, String rol, String lineasBrutas) throws SQLException {
         if (idDni == null || idDni.isBlank()) {
             throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado para comprar.");
@@ -131,6 +145,13 @@ public final class ServicioPedidos {
         }
     }
 
+    /**
+     * Recupera el historial persistido del cliente autenticado.
+     *
+     * @param idDni identificador del cliente
+     * @return documento JSON con pedidos y lineas
+     * @throws SQLException si falla la consulta contra MySQL
+     */
     public String listarPedidosCliente(String idDni) throws SQLException {
         if (idDni == null || idDni.isBlank()) {
             throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado.");

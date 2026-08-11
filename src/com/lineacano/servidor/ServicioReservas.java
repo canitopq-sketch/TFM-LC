@@ -84,9 +84,8 @@ public final class ServicioReservas {
      */
     public ResultadoDisponibilidad comprobarDisponibilidad(LocalDate fechaEntrada, LocalDate fechaSalida, int huespedes)
             throws SQLException {
-        if (!fechaSalida.isAfter(fechaEntrada)) {
-            throw new IllegalArgumentException("La fecha de salida debe ser posterior a la fecha de llegada.");
-        }
+        ReglasNegocio.validarPeriodoReserva(fechaEntrada, fechaSalida);
+        ReglasNegocio.validarHuespedes(huespedes);
 
         // La disponibilidad se calcula restando habitaciones reservadas a las habitaciones totales.
         Connection conexion = baseDeDatos.obtenerConexion();
@@ -143,9 +142,8 @@ public final class ServicioReservas {
             throw new IllegalArgumentException("El usuario autenticado no tiene un cliente vinculado para reservar.");
         }
 
-        if (!fechaSalida.isAfter(fechaEntrada)) {
-            throw new IllegalArgumentException("La fecha de salida debe ser posterior a la fecha de llegada.");
-        }
+        ReglasNegocio.validarPeriodoReserva(fechaEntrada, fechaSalida);
+        ReglasNegocio.validarHuespedes(huespedes);
 
         Connection conexion = baseDeDatos.obtenerConexion();
         boolean autocommitOriginal = conexion.getAutoCommit();
