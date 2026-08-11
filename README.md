@@ -24,11 +24,13 @@ Proyecto web con parte visual en HTML, CSS y JavaScript, y backend en Java para 
 - Muestra la landing del proyecto.
 - Permite iniciar sesion con usuario y contrasena mediante JSON.
 - Mantiene una vista publica centrada en experiencia, producto y marca.
-- Desbloquea la zona privada solo para roles `registrado` y `maestro`.
+- Desbloquea zonas privadas diferenciadas para roles `registrado`, `horeca` y `maestro`.
 - Permite consultar disponibilidad real desde la base de datos.
 - Permite crear una reserva real de prueba en las tablas `reserva` y `reserva_habitacion`.
 - Permite listar y cancelar reservas futuras desde el area privada del cliente.
-- Incorpora una tienda privada con carrito e historial de compras de prototipo en el navegador.
+- Incorpora una tienda privada con carrito en navegador y pedidos persistentes en MySQL.
+- Separa el panel HORECA profesional del panel de cliente particular.
+- Presenta un panel comercial con disponibilidad, alta HORECA y mapa inicial de backoffice.
 - Persiste las sesiones en MySQL y valida el token aunque el servidor se reinicie.
 - Sirve la web y la API desde un servidor Java ligero.
 
@@ -75,7 +77,9 @@ Este script importa:
 ## Usuarios de prueba
 
 - `cliente@lineacano.com` / `cliente123`
+- `horeca@lineacano.com` / `horeca123`
 - `comercial@lineacano.com` / `master123`
+- Los usuarios HORECA tambien se pueden crear desde el panel comercial.
 
 ## Arrancar el backend
 
@@ -120,7 +124,7 @@ Después abre:
 
 - Edicion avanzada de reservas
 - Gestión de habitaciones y salones
-- Panel específico para clientes
-- Panel específico para maestro/comercial
+- Pedidos HORECA persistentes en base de datos
+- Catalogo profesional con tarifas por cliente
 - Registro real de usuarios
 - Integracion futura con cierres de sesion y caducidad configurable

@@ -42,6 +42,7 @@ public final class Aplicacion {
         BaseDeDatos baseDeDatos = new BaseDeDatos(configuracion);
         ServicioReservas servicioReservas = new ServicioReservas(baseDeDatos);
         ServicioAutenticacion servicioAutenticacion = new ServicioAutenticacion(baseDeDatos);
+        ServicioPedidos servicioPedidos = new ServicioPedidos(baseDeDatos);
 
         // Se crea un servidor HTTP ligero suficiente para el prototipo del TFM.
         HttpServer servidor = HttpServer.create(new InetSocketAddress(configuracion.puerto()), 0);
@@ -54,6 +55,8 @@ public final class Aplicacion {
         servidor.createContext("/api/reservas", new ControladorReserva(servicioReservas, servicioAutenticacion));
         servidor.createContext("/api/reservas/mis-reservas", new ControladorMisReservas(servicioReservas, servicioAutenticacion));
         servidor.createContext("/api/reservas/cancelar", new ControladorCancelarReserva(servicioReservas, servicioAutenticacion));
+        servidor.createContext("/api/pedidos", new ControladorPedido(servicioPedidos, servicioAutenticacion));
+        servidor.createContext("/api/pedidos/mis-pedidos", new ControladorMisPedidos(servicioPedidos, servicioAutenticacion));
         servidor.createContext("/", new ControladorArchivosEstaticos(configuracion.raizWeb()));
         servidor.setExecutor(Executors.newCachedThreadPool());
 
@@ -412,6 +415,94 @@ public final class Aplicacion {
                 return Integer.parseInt(valorBruto);
             } catch (NumberFormatException ignorada) {
                 return 2;
+            }
+        }
+    }
+
+    private static final class ControladorPedido implements HttpHandler {
+        private final ServicioPedidos servicioPedidos;
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorPedido(ServicioPedidos servicioPedidos, ServicioAutenticacion servicioAutenticacion) {
+            this.servicioPedidos = servicioPedidos;
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"POST".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Optional<UsuarioSesion> sesion = servicioAutenticacion.buscarPorToken(
+                    intercambio.getRequestHeaders().getFirst("X-Linea-Token")
+            );
+
+            if (sesion.isEmpty()) {
+                escribirJson(intercambio, 401, "{\"error\":\"Debes iniciar sesion para crear un pedido.\"}");
+                return;
+            }
+
+            String rol = sesion.get().rol();
+            if (!"registrado".equals(rol) && !"horeca".equals(rol)) {
+                escribirJson(intercambio, 403, "{\"error\":\"Tu rol no tiene permiso para crear pedidos.\"}");
+                return;
+            }
+
+            Map<String, String> cuerpo = analizarCuerpo(intercambio);
+
+            try {
+                escribirJson(intercambio, 201, servicioPedidos.crearPedido(
+                        sesion.get().idDni(),
+                        rol,
+                        cuerpo.get("lineas")
+                ));
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            }
+        }
+    }
+
+    private static final class ControladorMisPedidos implements HttpHandler {
+        private final ServicioPedidos servicioPedidos;
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorMisPedidos(ServicioPedidos servicioPedidos, ServicioAutenticacion servicioAutenticacion) {
+            this.servicioPedidos = servicioPedidos;
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"GET".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            Optional<UsuarioSesion> sesion = servicioAutenticacion.buscarPorToken(
+                    intercambio.getRequestHeaders().getFirst("X-Linea-Token")
+            );
+
+            if (sesion.isEmpty()) {
+                escribirJson(intercambio, 401, "{\"error\":\"Debes iniciar sesion para consultar tus pedidos.\"}");
+                return;
+            }
+
+            String rol = sesion.get().rol();
+            if (!"registrado".equals(rol) && !"horeca".equals(rol)) {
+                escribirJson(intercambio, 403, "{\"error\":\"Tu rol no tiene permiso para ver pedidos.\"}");
+                return;
+            }
+
+            try {
+                escribirJson(intercambio, 200, servicioPedidos.listarPedidosCliente(sesion.get().idDni()));
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
             }
         }
     }

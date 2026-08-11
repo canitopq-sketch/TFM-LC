@@ -173,6 +173,10 @@ Contiene:
 
 Contiene:
 
+- explicación de puertas por rol:
+  - cliente particular
+  - profesional HORECA
+  - equipo interno
 - inicio de sesión
 - registro de nuevo usuario
 - mensajes de estado
@@ -190,18 +194,36 @@ Contiene:
 - confirmación de reserva
 - tienda privada de producto premium
 - carrito de compra en navegador
-- historial de compras de prototipo
+- historial de compras persistente en MySQL
 
-### 4.8. `comercial.html`
+### 4.8. `horeca-privado.html`
+
+**Función:** Panel privado profesional para clientes HORECA.
+
+Contiene:
+
+- estado de sesión profesional
+- catálogo HORECA
+- carrito profesional
+- historial de pedidos
+- bloque de condiciones B2B
+- base para futuras tarifas, estados de pedido y relación comercial
+
+### 4.9. `comercial.html`
 
 **Función:** Panel privado de administración / comercial.
 
 Contiene:
 
+- accesos rápidos a disponibilidad, alta HORECA y seguimiento
 - consulta de disponibilidad
 - creación de reservas
 - alta manual de clientes HORECA
-- base para futuras pantallas de gestión
+- mapa inicial de módulos de backoffice:
+  - reservas
+  - HORECA
+  - eventos
+  - producto
 
 ## 5. Roles de Usuario
 
@@ -211,13 +233,13 @@ Actualmente el sistema contempla estos roles funcionales:
   Puede navegar por la web pública sin iniciar sesión.
 
 - **registrado**
-  Puede iniciar sesión, consultar disponibilidad y realizar reservas.
+  Puede iniciar sesión, consultar disponibilidad, realizar reservas, comprar producto y revisar histórico.
 
 - **horeca**
-  Se crea desde administración. Actualmente reutiliza el acceso privado del cliente, aunque el proyecto queda preparado para una vista específica futura.
+  Se crea desde administración. Tiene una vista privada específica orientada a catálogo profesional, pedidos, condiciones B2B y relación comercial.
 
 - **maestro**
-  Perfil administrativo/comercial. Puede consultar disponibilidad, registrar reservas y dar de alta clientes HORECA.
+  Perfil administrativo/comercial. Puede consultar disponibilidad, registrar reservas, dar de alta clientes HORECA y revisar la estructura inicial de backoffice.
 
 ## 6. Funcionalidades Actuales
 
@@ -291,9 +313,9 @@ Permite:
 - modificar cantidades
 - vaciar el carrito
 - confirmar una compra simulada
-- guardar el historial de compras en el navegador del usuario
+- guardar el historial de compras y pedidos en MySQL
 
-Esta capa permite mostrar el flujo comercial de producto sin ampliar todavía el modelo de base de datos.
+Esta capa permite mostrar el flujo comercial de producto con persistencia real de pedidos y lineas de pedido.
 
 ### 6.7. Alta HORECA
 
@@ -336,6 +358,7 @@ Ficheros principales:
 - `eventos.html`
 - `acceso.html`
 - `cliente.html`
+- `horeca-privado.html`
 - `comercial.html`
 - `style.css`
 - `script.js`
@@ -394,7 +417,7 @@ Actualmente se aplican estas reglas:
 - la disponibilidad requiere sesión válida
 - la reserva requiere sesión válida
 - el alta HORECA requiere rol `maestro`
-- la contraseña se limita a un máximo de 12 caracteres alfanuméricos
+- la contraseña se limita a un máximo de 10 caracteres alfanuméricos
 
 ## 9. Material Visual Actual
 
@@ -419,6 +442,9 @@ En este momento el proyecto ya dispone de:
 - acceso y registro reales
 - roles funcionales
 - reserva funcional sobre base de datos
+- panel de cliente con carrito e historial de compras persistente
+- panel HORECA privado diferenciado
+- panel comercial con mapa inicial de backoffice
 - alta HORECA funcional desde administración
 - contenido alineado con el TFM
 
@@ -426,7 +452,6 @@ En este momento el proyecto ya dispone de:
 
 Quedan como posibles siguientes iteraciones:
 
-- vista privada específica para HORECA
 - catálogo profesional con fichas de producto reales
 - gestión de pedidos
 - calendario de eventos y salones

@@ -19,6 +19,8 @@
         <nav class="site-nav" aria-label="Navegacion privada">
             <a href="#panel" aria-current="true">Panel</a>
             <a href="#reserva">Disponibilidad</a>
+            <a href="#horeca-admin">HORECA</a>
+            <a href="#seguimiento">Seguimiento</a>
             <a href="index.html">Web publica</a>
         </nav>
 
@@ -32,7 +34,7 @@
                 <h2 id="titulo-pagina-privada">Consulta operativa, reservas y siguiente capa de gestion comercial.</h2>
             </div>
 
-            <div class="private-grid">
+            <div class="client-overview">
                 <article class="private-card private-card-dark">
                     <span class="role-kicker">Sesion activa</span>
                     <h3 id="nombre-usuario-privado">Perfil comercial</h3>
@@ -47,23 +49,22 @@
                     </div>
                 </article>
 
-                <article class="private-card">
-                    <span class="role-kicker">Negocio</span>
-                    <h3>Una base preparada para eventos, HORECA, turismo premium y seguimiento comercial.</h3>
-                    <div class="role-features">
-                        <article>
-                            <strong>Eventos de alto nivel</strong>
-                            <span>Salon de 350 pax, bodas, empresa y presupuestos personalizados.</span>
-                        </article>
-                        <article>
-                            <strong>Captacion segmentada</strong>
-                            <span>Turismo premium, profesional HORECA y experiencias ligadas a la dehesa.</span>
-                        </article>
-                        <article>
-                            <strong>Expansion futura</strong>
-                            <span>Base lista para CRM, calendario comercial, dossieres y cuadros de ocupacion.</span>
-                        </article>
-                    </div>
+                <article class="client-action-panel">
+                    <a class="client-action" href="#reserva">
+                        <span>01</span>
+                        <strong>Disponibilidad</strong>
+                        <small>Consulta ocupacion real y registra reservas operativas.</small>
+                    </a>
+                    <a class="client-action" href="#horeca-admin">
+                        <span>02</span>
+                        <strong>Alta HORECA</strong>
+                        <small>Crea cuentas profesionales y segmenta clientes B2B.</small>
+                    </a>
+                    <a class="client-action" href="#seguimiento">
+                        <span>03</span>
+                        <strong>Seguimiento</strong>
+                        <small>Base para CRM, eventos, pedidos y oportunidades.</small>
+                    </a>
                 </article>
             </div>
         </section>
@@ -131,7 +132,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="horeca-admin">
             <div class="section-heading">
                 <p class="eyebrow">Administracion</p>
                 <h2>Alta manual de clientes HORECA para activar acceso profesional desde el panel maestro.</h2>
@@ -180,10 +181,10 @@
                             <input
                                 id="horeca-contrasena"
                                 type="password"
-                                placeholder="Maximo 12 caracteres"
-                                maxlength="12"
-                                pattern="[A-Za-z0-9]{1,12}"
-                                title="La contraseña debe tener un máximo de 12 caracteres alfanuméricos."
+                                placeholder="Maximo 10 caracteres"
+                                maxlength="10"
+                                pattern="[A-Za-z0-9]{1,10}"
+                                title="La contraseña debe tener un máximo de 10 caracteres alfanuméricos."
                                 required
                             >
                         </label>
@@ -204,6 +205,40 @@
                         <strong class="availability-title">Esperando datos de alta</strong>
                         <p class="availability-text">Introduce los datos del profesional para crear su acceso desde el panel maestro.</p>
                     </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="seguimiento">
+            <div class="section-heading">
+                <p class="eyebrow">Backoffice</p>
+                <h2>Mapa inicial de gestion interna para las siguientes iteraciones del proyecto.</h2>
+            </div>
+
+            <div class="admin-module-grid">
+                <article class="admin-module-card">
+                    <span class="role-kicker">Reservas</span>
+                    <h3>Ocupacion y estancias</h3>
+                    <p>Gestion avanzada de reservas, cambios de fecha, habitaciones y estados.</p>
+                    <strong>Estado: base funcional</strong>
+                </article>
+                <article class="admin-module-card">
+                    <span class="role-kicker">HORECA</span>
+                    <h3>Cuentas profesionales</h3>
+                    <p>Alta de empresas, catalogo privado, condiciones y pedidos recurrentes.</p>
+                    <strong>Estado: alta funcional</strong>
+                </article>
+                <article class="admin-module-card">
+                    <span class="role-kicker">Eventos</span>
+                    <h3>MICE y bodas</h3>
+                    <p>Solicitudes, presupuestos, calendario de salones y dossieres comerciales.</p>
+                    <strong>Estado: roadmap</strong>
+                </article>
+                <article class="admin-module-card">
+                    <span class="role-kicker">Producto</span>
+                    <h3>Pedidos y stock</h3>
+                    <p>Catalogo, compras, historico, preparacion y futura conexion con inventario.</p>
+                    <strong>Estado: prototipo</strong>
                 </article>
             </div>
         </section>

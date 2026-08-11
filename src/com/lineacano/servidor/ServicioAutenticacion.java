@@ -121,8 +121,8 @@ public final class ServicioAutenticacion {
             throw new IllegalArgumentException("Usuario y contraseña son obligatorios.");
         }
 
-        if (!contrasena.matches("[A-Za-z0-9]{1,12}")) {
-            throw new IllegalArgumentException("La contraseña debe tener un maximo de 12 caracteres alfanumericos.");
+        if (!contrasena.matches("[A-Za-z0-9]{1,10}")) {
+            throw new IllegalArgumentException("La contraseña debe tener un maximo de 10 caracteres alfanumericos.");
         }
 
         // Se normaliza el correo para evitar diferencias por mayúsculas o espacios.
@@ -504,8 +504,8 @@ public final class ServicioAutenticacion {
             throw new IllegalArgumentException("La contraseña es obligatoria.");
         }
 
-        if (!contrasena.matches("[A-Za-z0-9]{1,12}")) {
-            throw new IllegalArgumentException("La contraseña debe tener un maximo de 12 caracteres alfanumericos.");
+        if (!contrasena.matches("[A-Za-z0-9]{1,10}")) {
+            throw new IllegalArgumentException("La contraseña debe tener un maximo de 10 caracteres alfanumericos.");
         }
     }
 

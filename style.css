@@ -1425,6 +1425,58 @@ img {
     align-items: stretch;
 }
 
+.access-role-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.access-grid {
+    margin-top: 1rem;
+}
+
+.access-role-card,
+.admin-module-card {
+    padding: 1.35rem;
+    border-radius: 1.2rem;
+    border: 1px solid rgba(42, 76, 104, 0.12);
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: 0 14px 34px rgba(24, 41, 59, 0.08);
+}
+
+.access-role-card span {
+    width: 2.3rem;
+    height: 2.3rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(190, 141, 57, 0.16);
+    color: var(--accent-deep);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.access-role-card strong,
+.admin-module-card strong {
+    display: block;
+    color: var(--navy-deep);
+}
+
+.access-role-card strong {
+    margin-top: 1rem;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.access-role-card p,
+.admin-module-card p {
+    margin-top: 0.7rem;
+    color: var(--muted);
+    line-height: 1.62;
+}
+
 .client-action-panel {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1799,6 +1851,26 @@ img {
     margin-top: 3rem;
 }
 
+.admin-module-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.admin-module-card h3 {
+    margin-top: 0.9rem;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: var(--navy-deep);
+}
+
+.admin-module-card strong {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+}
+
 .compact-heading h2 {
     max-width: 42rem;
     font-size: clamp(2rem, 3.2vw, 3rem);
@@ -1837,10 +1909,12 @@ img {
     .sitemap-grid,
     .contact-strip,
     .access-layout,
+    .access-role-grid,
     .client-overview,
     .private-grid,
     .reservation-layout,
     .shop-layout,
+    .admin-module-grid,
     .role-panel,
     .stats-strip,
     .reservation-history {

@@ -47,116 +47,122 @@ let ultimaDisponibilidad = null;
 
 inicializarPortalPrivado();
 
-formularioReserva.addEventListener("submit", async (evento) => {
-    evento.preventDefault();
+if (formularioReserva) {
+    formularioReserva.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
 
-    if (!fechasSonValidas()) {
-        return;
-    }
-
-    try {
-        const parametros = new URLSearchParams({
-            fechaEntrada: campoFechaEntrada.value,
-            fechaSalida: campoFechaSalida.value,
-            huespedes: campoHuespedes.value
-        });
-
-        const respuesta = await fetch(
-            `/api/disponibilidad?${parametros.toString()}`,
-            {
-                headers: {
-                    "Accept": "application/json",
-                    "X-Linea-Token": sesionActiva.token
-                }
-            }
-        );
-
-        if (respuesta.status === 401) {
-            cerrarSesionPorExpiracion();
+        if (!fechasSonValidas()) {
             return;
         }
 
-        const datos = await leerRespuestaJson(respuesta);
-
-        if (!respuesta.ok) {
-            throw new Error(datos.error || "No se pudo consultar la disponibilidad real.");
-        }
-
-        ultimaDisponibilidad = datos;
-        renderizarDisponibilidad(datos.titulo, datos.mensaje, datos.estado);
-        actualizarResumenReserva(datos);
-        actualizarBotonReserva();
-    } catch (error) {
-        ultimaDisponibilidad = null;
-        actualizarBotonReserva();
-        renderizarDisponibilidad("Error de consulta", error.message || "No se pudo obtener disponibilidad.", "aviso");
-    }
-});
-
-botonConfirmarReserva.addEventListener("click", async () => {
-    if (!ultimaDisponibilidad || ultimaDisponibilidad.habitacionesDisponibles < 1) {
-        renderizarDisponibilidad(
-            "Reserva no disponible",
-            "Antes de confirmar, realiza una consulta con disponibilidad positiva.",
-            "aviso"
-        );
-        return;
-    }
-
-    try {
-        botonConfirmarReserva.disabled = true;
-
-        const respuesta = await fetch("/api/reservas", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Linea-Token": sesionActiva.token
-            },
-            body: JSON.stringify({
+        try {
+            const parametros = new URLSearchParams({
                 fechaEntrada: campoFechaEntrada.value,
                 fechaSalida: campoFechaSalida.value,
-                huespedes: Number(campoHuespedes.value)
-            })
-        });
+                huespedes: campoHuespedes.value
+            });
 
-        if (respuesta.status === 401) {
-            cerrarSesionPorExpiracion();
+            const respuesta = await fetch(
+                `/api/disponibilidad?${parametros.toString()}`,
+                {
+                    headers: {
+                        "Accept": "application/json",
+                        "X-Linea-Token": sesionActiva.token
+                    }
+                }
+            );
+
+            if (respuesta.status === 401) {
+                cerrarSesionPorExpiracion();
+                return;
+            }
+
+            const datos = await leerRespuestaJson(respuesta);
+
+            if (!respuesta.ok) {
+                throw new Error(datos.error || "No se pudo consultar la disponibilidad real.");
+            }
+
+            ultimaDisponibilidad = datos;
+            renderizarDisponibilidad(datos.titulo, datos.mensaje, datos.estado);
+            actualizarResumenReserva(datos);
+            actualizarBotonReserva();
+        } catch (error) {
+            ultimaDisponibilidad = null;
+            actualizarBotonReserva();
+            renderizarDisponibilidad("Error de consulta", error.message || "No se pudo obtener disponibilidad.", "aviso");
+        }
+    });
+}
+
+if (botonConfirmarReserva) {
+    botonConfirmarReserva.addEventListener("click", async () => {
+        if (!ultimaDisponibilidad || ultimaDisponibilidad.habitacionesDisponibles < 1) {
+            renderizarDisponibilidad(
+                "Reserva no disponible",
+                "Antes de confirmar, realiza una consulta con disponibilidad positiva.",
+                "aviso"
+            );
             return;
         }
 
-        const datos = await leerRespuestaJson(respuesta);
+        try {
+            botonConfirmarReserva.disabled = true;
 
-        if (!respuesta.ok) {
-            throw new Error(datos.error || "No se pudo crear la reserva.");
+            const respuesta = await fetch("/api/reservas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-Linea-Token": sesionActiva.token
+                },
+                body: JSON.stringify({
+                    fechaEntrada: campoFechaEntrada.value,
+                    fechaSalida: campoFechaSalida.value,
+                    huespedes: Number(campoHuespedes.value)
+                })
+            });
+
+            if (respuesta.status === 401) {
+                cerrarSesionPorExpiracion();
+                return;
+            }
+
+            const datos = await leerRespuestaJson(respuesta);
+
+            if (!respuesta.ok) {
+                throw new Error(datos.error || "No se pudo crear la reserva.");
+            }
+
+            renderizarDisponibilidad(
+                datos.titulo,
+                `${datos.mensaje} Estancia del ${formatearFecha(datos.fechaEntrada)} al ${formatearFecha(datos.fechaSalida)}. Habitacion ${datos.habitacionAsignada}. Reserva ${datos.idReserva}. Importe estimado ${formatearImporte(datos.importeTotal)}.`,
+                "disponible"
+            );
+
+            actualizarResumenReserva({
+                habitacionesDisponibles: Math.max((ultimaDisponibilidad?.habitacionesDisponibles || 1) - 1, 0),
+                habitacionesReservadas: (ultimaDisponibilidad?.habitacionesReservadas || 0) + 1,
+                totalHabitaciones: ultimaDisponibilidad?.totalHabitaciones || 0
+            });
+
+            ultimaDisponibilidad = null;
+            actualizarBotonReserva();
+            cargarMisReservas();
+        } catch (error) {
+            renderizarDisponibilidad("No se pudo confirmar", error.message || "La reserva no pudo registrarse.", "aviso");
+        } finally {
+            botonConfirmarReserva.disabled = false;
         }
+    });
+}
 
-        renderizarDisponibilidad(
-            datos.titulo,
-            `${datos.mensaje} Estancia del ${formatearFecha(datos.fechaEntrada)} al ${formatearFecha(datos.fechaSalida)}. Habitacion ${datos.habitacionAsignada}. Reserva ${datos.idReserva}. Importe estimado ${formatearImporte(datos.importeTotal)}.`,
-            "disponible"
-        );
-
-        actualizarResumenReserva({
-            habitacionesDisponibles: Math.max((ultimaDisponibilidad?.habitacionesDisponibles || 1) - 1, 0),
-            habitacionesReservadas: (ultimaDisponibilidad?.habitacionesReservadas || 0) + 1,
-            totalHabitaciones: ultimaDisponibilidad?.totalHabitaciones || 0
-        });
-
-        ultimaDisponibilidad = null;
-        actualizarBotonReserva();
-        cargarMisReservas();
-    } catch (error) {
-        renderizarDisponibilidad("No se pudo confirmar", error.message || "La reserva no pudo registrarse.", "aviso");
-    } finally {
-        botonConfirmarReserva.disabled = false;
-    }
-});
-
-botonCerrarSesion.addEventListener("click", () => {
-    localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-    window.location.href = "acceso.html";
-});
+if (botonCerrarSesion) {
+    botonCerrarSesion.addEventListener("click", () => {
+        localStorage.removeItem(CLAVE_ALMACENAMIENTO);
+        window.location.href = "acceso.html";
+    });
+}
 
 if (formularioHoreca) {
     formularioHoreca.addEventListener("submit", async (evento) => {
@@ -173,11 +179,11 @@ if (formularioHoreca) {
             contrasena: document.querySelector("#horeca-contrasena").value.trim()
         };
 
-        if (!/^[A-Za-z0-9]{1,12}$/.test(datosFormulario.contrasena)) {
+        if (!/^[A-Za-z0-9]{1,10}$/.test(datosFormulario.contrasena)) {
             renderizarEstadoHoreca(
                 "aviso",
                 "Contrasena no valida",
-                "La contrasena inicial debe tener un maximo de 12 caracteres alfanumericos."
+                "La contrasena inicial debe tener un maximo de 10 caracteres alfanumericos."
             );
             document.querySelector("#horeca-contrasena").focus();
             return;
@@ -293,7 +299,12 @@ function protegerPagina() {
         return;
     }
 
-    if (tipoPagina === "cliente" && sesionActiva.rol !== "registrado" && sesionActiva.rol !== "horeca") {
+    if (tipoPagina === "cliente" && sesionActiva.rol !== "registrado") {
+        redirigirSegunPerfil(sesionActiva.rol);
+        return;
+    }
+
+    if (tipoPagina === "horeca" && sesionActiva.rol !== "horeca") {
         redirigirSegunPerfil(sesionActiva.rol);
         return;
     }
@@ -310,8 +321,8 @@ function protegerPagina() {
         textoPrivado.textContent = "Desde este entorno comercial puedes validar ocupacion, confirmar reservas y preparar la siguiente capa de operativa.";
         estadoSesion.dataset.state = "maestro";
     } else if (sesionActiva.rol === "horeca") {
-        tituloPrivado.textContent = "Frontal profesional HORECA con acceso inicial a disponibilidad y futura capa comercial.";
-        textoPrivado.textContent = "Este acceso profesional queda preparado para tarifas, catalogo premium, seguimiento de pedidos y operativa comercial.";
+        tituloPrivado.textContent = "Panel profesional HORECA con catalogo, pedidos y relacion comercial.";
+        textoPrivado.textContent = "Este entorno separa el canal profesional para trabajar producto, condiciones, pedidos recurrentes y contacto comercial.";
         estadoSesion.dataset.state = "horeca";
     } else {
         tituloPrivado.textContent = "Panel privado para reservar estancia, comprar producto y revisar tu actividad.";
@@ -326,8 +337,13 @@ function redirigirSegunPerfil(rol) {
         return;
     }
 
-    if (rol === "registrado" || rol === "horeca") {
+    if (rol === "registrado") {
         window.location.href = "cliente.html";
+        return;
+    }
+
+    if (rol === "horeca") {
+        window.location.href = "horeca-privado.html";
         return;
     }
 
@@ -442,7 +458,7 @@ function configurarCarrito() {
     }
 
     renderizarCarrito();
-    renderizarHistorialCompras();
+    cargarHistorialComprasServidor();
 }
 
 function agregarProductoAlCarrito(idProducto) {
@@ -535,7 +551,7 @@ function cambiarCantidadProducto(idProducto, variacion) {
     renderizarCarrito();
 }
 
-function confirmarCompra() {
+async function confirmarCompra() {
     const carrito = cargarCarrito();
 
     if (carrito.length === 0) {
@@ -543,40 +559,109 @@ function confirmarCompra() {
         return;
     }
 
-    const compra = {
-        id: `LC-${Date.now()}`,
-        fecha: new Date().toISOString(),
-        estado: "Solicitud recibida",
-        total: calcularTotalCarrito(carrito),
-        lineas: carrito.map((linea) => ({
-            ...linea,
-            nombre: CATALOGO_PRODUCTOS[linea.id].nombre,
-            categoria: CATALOGO_PRODUCTOS[linea.id].categoria,
-            precio: CATALOGO_PRODUCTOS[linea.id].precio
-        }))
-    };
+    const esPanelHoreca = document.body.dataset.paginaPrivada === "horeca";
 
-    const historial = cargarHistorialCompras();
-    historial.unshift(compra);
-    guardarHistorialCompras(historial);
-    guardarCarrito([]);
-    renderizarCarrito();
-    renderizarHistorialCompras();
-    renderizarEstadoCarrito("disponible", "Compra registrada", `Pedido ${compra.id} guardado en tu historial de compras.`);
+    try {
+        if (botonConfirmarCompra) {
+            botonConfirmarCompra.disabled = true;
+        }
+
+        renderizarEstadoCarrito("bloqueado", "Guardando pedido", "Registrando el pedido en la base de datos.");
+
+        const respuesta = await fetch("/api/pedidos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-Linea-Token": sesionActiva.token
+            },
+            body: JSON.stringify({
+                lineas: serializarCarrito(carrito)
+            })
+        });
+
+        if (respuesta.status === 401) {
+            cerrarSesionPorExpiracion();
+            return;
+        }
+
+        const datos = await leerRespuestaJson(respuesta);
+
+        if (!respuesta.ok) {
+            throw new Error(datos.error || "No se pudo registrar el pedido.");
+        }
+
+        guardarCarrito([]);
+        renderizarCarrito();
+        await cargarHistorialComprasServidor();
+        renderizarEstadoCarrito(
+            "disponible",
+            esPanelHoreca ? "Pedido registrado" : "Compra registrada",
+            `${datos.mensaje} Ya aparece en tu historial de ${esPanelHoreca ? "pedidos" : "compras"}.`
+        );
+    } catch (error) {
+        renderizarEstadoCarrito(
+            "aviso",
+            "Pedido no registrado",
+            error.message || "No se ha podido guardar el pedido en la base de datos."
+        );
+    } finally {
+        renderizarCarrito();
+    }
 }
 
-function renderizarHistorialCompras() {
+async function cargarHistorialComprasServidor() {
+    if (!historialCompras || !sesionActiva?.token) {
+        return;
+    }
+
+    historialCompras.innerHTML = `
+        <article class="history-card history-card-empty">
+            <strong>Cargando historial</strong>
+            <p>Consultando pedidos guardados en la base de datos.</p>
+        </article>
+    `;
+
+    try {
+        const respuesta = await fetch("/api/pedidos/mis-pedidos", {
+            headers: {
+                "Accept": "application/json",
+                "X-Linea-Token": sesionActiva.token
+            }
+        });
+
+        if (respuesta.status === 401) {
+            cerrarSesionPorExpiracion();
+            return;
+        }
+
+        const datos = await leerRespuestaJson(respuesta);
+
+        if (!respuesta.ok) {
+            throw new Error(datos.error || "No se pudo cargar el historial de pedidos.");
+        }
+
+        renderizarHistorialCompras(datos.pedidos || []);
+    } catch (error) {
+        historialCompras.innerHTML = `
+            <article class="history-card history-card-empty">
+                <strong>No se pudo cargar el historial</strong>
+                <p>${error.message || "Intentalo de nuevo en unos segundos."}</p>
+            </article>
+        `;
+    }
+}
+
+function renderizarHistorialCompras(historial) {
     if (!historialCompras) {
         return;
     }
 
-    const historial = cargarHistorialCompras();
-
-    if (historial.length === 0) {
+    if (!Array.isArray(historial) || historial.length === 0) {
         historialCompras.innerHTML = `
             <article class="history-card history-card-empty">
                 <strong>No hay compras registradas</strong>
-                <p>Los pedidos confirmados desde el carrito apareceran en este historial.</p>
+                <p>Los pedidos confirmados desde el carrito apareceran en este historial real.</p>
             </article>
         `;
         return;
@@ -607,14 +692,6 @@ function guardarCarrito(carrito) {
     localStorage.setItem(claveCarrito(), JSON.stringify(carrito));
 }
 
-function cargarHistorialCompras() {
-    return cargarArrayLocal(claveHistorialCompras());
-}
-
-function guardarHistorialCompras(historial) {
-    localStorage.setItem(claveHistorialCompras(), JSON.stringify(historial));
-}
-
 function cargarArrayLocal(clave) {
     try {
         const valorGuardado = localStorage.getItem(clave);
@@ -629,15 +706,18 @@ function claveCarrito() {
     return `linea_cano_carrito_${sesionActiva?.usuario || "anonimo"}`;
 }
 
-function claveHistorialCompras() {
-    return `linea_cano_compras_${sesionActiva?.usuario || "anonimo"}`;
-}
-
 function calcularTotalCarrito(carrito) {
     return carrito.reduce((total, linea) => {
         const producto = CATALOGO_PRODUCTOS[linea.id];
         return producto ? total + producto.precio * linea.cantidad : total;
     }, 0);
+}
+
+function serializarCarrito(carrito) {
+    return carrito
+        .filter((linea) => CATALOGO_PRODUCTOS[linea.id] && linea.cantidad > 0)
+        .map((linea) => `${linea.id}:${linea.cantidad}`)
+        .join(";");
 }
 
 async function cancelarReservaCliente(idReserva) {
@@ -722,6 +802,10 @@ function cerrarSesionPorExpiracion() {
 }
 
 function configurarFechas() {
+    if (!campoFechaEntrada || !campoFechaSalida) {
+        return;
+    }
+
     const hoy = new Date();
     const fechaHoyIso = hoy.toISOString().split("T")[0];
     campoFechaEntrada.min = fechaHoyIso;
@@ -853,7 +937,7 @@ function renderizarEstadoCarrito(estado, titulo, texto) {
 
     estadoCarrito.dataset.state = estado;
     estadoCarrito.innerHTML = `
-        <p class="availability-label">Estado del carrito</p>
+        <p class="availability-label">${document.body.dataset.paginaPrivada === "horeca" ? "Estado del pedido" : "Estado del carrito"}</p>
         <strong class="availability-title">${titulo}</strong>
         <p class="availability-text">${texto}</p>
     `;

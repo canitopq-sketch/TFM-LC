@@ -32,16 +32,34 @@
         <section class="section private-hero">
             <div class="section-heading">
                 <p class="eyebrow">Acceso privado</p>
-                <h2>Accede a tu area privada o solicita registro para entrar en el ecosistema Linea Cano.</h2>
+                <h2>Elige la puerta correcta: cliente particular, profesional HORECA o equipo Linea Cano.</h2>
             </div>
 
-            <div class="private-grid">
+            <div class="access-role-grid">
+                <article class="access-role-card">
+                    <span>01</span>
+                    <strong>Cliente particular</strong>
+                    <p>Registro abierto para reservar estancia, comprar producto y consultar historicos.</p>
+                </article>
+                <article class="access-role-card">
+                    <span>02</span>
+                    <strong>Profesional HORECA</strong>
+                    <p>Acceso bajo alta comercial para catalogo profesional, pedidos y condiciones.</p>
+                </article>
+                <article class="access-role-card">
+                    <span>03</span>
+                    <strong>Equipo interno</strong>
+                    <p>Entrada reservada al perfil maestro para disponibilidad, altas y gestion comercial.</p>
+                </article>
+            </div>
+
+            <div class="private-grid access-grid">
                 <article class="private-card private-card-dark">
-                    <span class="role-kicker">Acceso</span>
-                    <h3>Inicia sesion para entrar en tu frontal segun perfil.</h3>
+                    <span class="role-kicker">Ya tengo cuenta</span>
+                    <h3>Inicia sesion y el sistema te llevara al panel correspondiente.</h3>
                     <p class="auth-copy">
-                        El cliente registrado entra en su panel de disponibilidad y reserva. El perfil comercial accede a un frontal
-                        especifico de seguimiento, consulta y operativa inicial.
+                        Cada rol tiene una vista propia: cliente, profesional HORECA o equipo comercial. Usa el correo
+                        asociado a tu alta.
                     </p>
 
                     <form class="auth-form" id="formulario-acceso">
@@ -56,9 +74,9 @@
                                 name="contrasena"
                                 type="password"
                                 placeholder="cliente123"
-                                maxlength="12"
-                                pattern="[A-Za-z0-9]{1,12}"
-                                title="La contraseña debe tener un máximo de 12 caracteres alfanuméricos."
+                                maxlength="10"
+                                pattern="[A-Za-z0-9]{1,10}"
+                                title="La contraseña debe tener un máximo de 10 caracteres alfanuméricos."
                                 required
                             >
                         </label>
@@ -73,11 +91,11 @@
                 </article>
 
                 <article class="private-card">
-                    <span class="role-kicker">Registro</span>
-                    <h3>Crea tu cuenta de cliente para consultar disponibilidad y reservar directamente.</h3>
+                    <span class="role-kicker">Nuevo cliente</span>
+                    <h3>Crea una cuenta particular para reservar y comprar desde el area cliente.</h3>
                     <p class="private-text">
-                        Este formulario da de alta nuevos usuarios registrados dentro del sistema. El alta profesional HORECA
-                        queda reservada al panel de administracion para mantener el acceso segmentado.
+                        El registro automatico es solo para cliente particular. Si eres restaurante, hotel o distribuidor,
+                        solicita el alta profesional al equipo comercial.
                     </p>
 
                     <form class="register-form" id="formulario-registro">
@@ -106,10 +124,10 @@
                             <input
                                 id="registro-contrasena"
                                 type="password"
-                                placeholder="Maximo 12 caracteres"
-                                maxlength="12"
-                                pattern="[A-Za-z0-9]{1,12}"
-                                title="La contraseña debe tener un máximo de 12 caracteres alfanuméricos."
+                                placeholder="Maximo 10 caracteres"
+                                maxlength="10"
+                                pattern="[A-Za-z0-9]{1,10}"
+                                title="La contraseña debe tener un máximo de 10 caracteres alfanuméricos."
                                 required
                             >
                         </label>
@@ -119,7 +137,7 @@
                     <div class="availability-card" id="estado-registro" data-state="bloqueado">
                         <p class="availability-label">Registro</p>
                         <strong class="availability-title">Alta de cliente</strong>
-                        <p class="availability-text">Rellena tus datos para crear una cuenta de cliente registrado en Linea Cano.</p>
+                        <p class="availability-text">Rellena tus datos para crear una cuenta particular en Linea Cano.</p>
                     </div>
                 </article>
             </div>

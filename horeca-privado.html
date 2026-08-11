@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area HORECA | Linea Cano</title>
+    <meta name="description" content="Panel privado HORECA para catalogo profesional, pedidos y relacion comercial de Linea Cano.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-pagina-privada="horeca">
+    <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Inicio Linea Cano">
+            <img class="brand-logo" src="imagenes/Logo_LineaCano.jpg" alt="Logo de Linea Cano">
+        </a>
+
+        <nav class="site-nav" aria-label="Navegacion privada HORECA">
+            <a href="#panel" aria-current="true">Panel</a>
+            <a href="#catalogo">Catalogo</a>
+            <a href="#condiciones">Condiciones</a>
+            <a href="#compras">Pedidos</a>
+            <a href="index.html">Web publica</a>
+        </nav>
+
+        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesion</button>
+    </header>
+
+    <main class="private-shell" id="panel">
+        <section class="section private-hero">
+            <div class="section-heading">
+                <p class="eyebrow">Area HORECA</p>
+                <h2 id="titulo-pagina-privada">Panel profesional HORECA con catalogo, pedidos y relacion comercial.</h2>
+            </div>
+
+            <div class="client-overview">
+                <article class="private-card private-card-dark">
+                    <span class="role-kicker">Sesion profesional</span>
+                    <h3 id="nombre-usuario-privado">Cliente HORECA</h3>
+                    <p class="auth-copy" id="texto-usuario-privado">
+                        Este acceso profesional queda preparado para catalogo premium, pedidos recurrentes y seguimiento comercial.
+                    </p>
+
+                    <div class="session-status" id="estado-sesion" data-state="horeca">
+                        <p class="availability-label">Estado de acceso</p>
+                        <strong class="availability-title">Acceso HORECA autorizado</strong>
+                        <p class="availability-text">El perfil profesional puede preparar pedidos y consultar condiciones de trabajo.</p>
+                    </div>
+                </article>
+
+                <article class="client-action-panel">
+                    <a class="client-action" href="#catalogo">
+                        <span>01</span>
+                        <strong>Catalogo profesional</strong>
+                        <small>Lineas premium preparadas para restauracion y hoteleria.</small>
+                    </a>
+                    <a class="client-action" href="#condiciones">
+                        <span>02</span>
+                        <strong>Condiciones B2B</strong>
+                        <small>Pedido minimo, frecuencia, contacto y gestion comercial.</small>
+                    </a>
+                    <a class="client-action" href="#compras">
+                        <span>03</span>
+                        <strong>Pedidos</strong>
+                        <small>Carrito profesional e historial guardado por usuario.</small>
+                    </a>
+                </article>
+            </div>
+        </section>
+
+        <section class="section shop-section" id="catalogo">
+            <div class="section-heading">
+                <p class="eyebrow">Catalogo profesional</p>
+                <h2>Producto premium para cocinas, hoteles y compradores especializados.</h2>
+            </div>
+
+            <div class="shop-layout">
+                <div class="product-shop-grid">
+                    <article class="shop-product-card">
+                        <img src="imagenes/Iberico.png" alt="Linea iberica profesional">
+                        <div>
+                            <span class="role-kicker">Iberico</span>
+                            <h3>Lote profesional iberico</h3>
+                            <p>Formato degustacion para carta, eventos y servicio gourmet.</p>
+                            <div class="shop-product-footer">
+                                <strong>89,00 €</strong>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="iberico">Anadir</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="shop-product-card">
+                        <img src="imagenes/buey.png" alt="Buey madurado profesional">
+                        <div>
+                            <span class="role-kicker">Buey</span>
+                            <h3>Corte madurado profesional</h3>
+                            <p>Pieza premium para cocina especializada y propuesta de alto valor.</p>
+                            <div class="shop-product-footer">
+                                <strong>126,00 €</strong>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="buey">Anadir</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="shop-product-card">
+                        <img src="imagenes/Fresco.png" alt="Despensa fresca profesional">
+                        <div>
+                            <span class="role-kicker">Despensa</span>
+                            <h3>Cesta fresca de temporada</h3>
+                            <p>Producto de huerta y complementos para menus de proximidad.</p>
+                            <div class="shop-product-footer">
+                                <strong>42,00 €</strong>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="despensa">Anadir</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <aside class="cart-panel" aria-live="polite">
+                    <div class="booking-head">
+                        <span class="role-kicker">Pedido</span>
+                        <h3>Carrito profesional</h3>
+                    </div>
+                    <div class="cart-items" id="lista-carrito"></div>
+                    <div class="cart-total">
+                        <span>Total</span>
+                        <strong id="total-carrito">0,00 €</strong>
+                    </div>
+                    <button class="button button-primary booking-submit" id="boton-confirmar-compra" type="button">Confirmar pedido</button>
+                    <button class="button button-secondary booking-submit" id="boton-vaciar-carrito" type="button">Vaciar carrito</button>
+                    <div class="availability-card" id="estado-carrito" data-state="bloqueado">
+                        <p class="availability-label">Estado del pedido</p>
+                        <strong class="availability-title">Sin productos</strong>
+                        <p class="availability-text">Anade productos para preparar un pedido profesional de prueba.</p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section" id="condiciones">
+            <div class="section-heading">
+                <p class="eyebrow">Condiciones B2B</p>
+                <h2>Una capa profesional distinta al cliente particular.</h2>
+            </div>
+
+            <div class="private-grid">
+                <article class="private-card">
+                    <span class="role-kicker">Relacion comercial</span>
+                    <h3>Pedido recurrente, contacto directo y condiciones por cliente.</h3>
+                    <div class="role-features">
+                        <article>
+                            <strong>Pedido minimo</strong>
+                            <span>Definible por familia de producto y frecuencia de servicio.</span>
+                        </article>
+                        <article>
+                            <strong>Atencion comercial</strong>
+                            <span>Seguimiento desde el panel maestro para altas, pedidos y oportunidades.</span>
+                        </article>
+                        <article>
+                            <strong>Evolucion futura</strong>
+                            <span>Tarifas, estados de pedido, facturacion y catalogo privado por cuenta.</span>
+                        </article>
+                    </div>
+                </article>
+
+                <article class="private-card">
+                    <span class="role-kicker">Siguiente iteracion</span>
+                    <h3>Del prototipo de carrito a una gestion profesional completa.</h3>
+                    <p class="private-text">
+                        Esta pantalla separa la experiencia profesional y deja preparada la evolucion hacia pedidos persistentes
+                        en base de datos, catalogo B2B y contacto comercial trazable.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="compras">
+            <div class="section-heading">
+                <p class="eyebrow">Historial profesional</p>
+                <h2>Pedidos preparados desde el area HORECA.</h2>
+            </div>
+
+            <div class="reservation-history" id="historial-compras" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script src="portal-privado.js"></script>
+</body>
+</html>
