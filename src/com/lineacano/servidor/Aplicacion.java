@@ -40,9 +40,13 @@ public final class Aplicacion {
         // Carga la configuración y los servicios principales de la aplicación.
         Configuracion configuracion = Configuracion.cargar();
         BaseDeDatos baseDeDatos = new BaseDeDatos(configuracion);
-        ServicioReservas servicioReservas = new ServicioReservas(baseDeDatos);
-        ServicioAutenticacion servicioAutenticacion = new ServicioAutenticacion(baseDeDatos);
-        ServicioPedidos servicioPedidos = new ServicioPedidos(baseDeDatos);
+        ReservaDao reservaDao = new ReservaDao(baseDeDatos);
+        ServicioReservas servicioReservas = new ServicioReservas(reservaDao);
+        UsuarioDao usuarioDao = new UsuarioDao(baseDeDatos);
+        SesionDao sesionDao = new SesionDao(baseDeDatos);
+        ServicioAutenticacion servicioAutenticacion = new ServicioAutenticacion(usuarioDao, sesionDao);
+        PedidoDao pedidoDao = new PedidoDao(baseDeDatos);
+        ServicioPedidos servicioPedidos = new ServicioPedidos(pedidoDao);
 
         // Se crea un servidor HTTP ligero suficiente para el prototipo del TFM.
         HttpServer servidor = HttpServer.create(new InetSocketAddress(configuracion.puerto()), 0);
