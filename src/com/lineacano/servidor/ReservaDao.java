@@ -73,6 +73,12 @@ public class ReservaDao {
         this.baseDeDatos = baseDeDatos;
     }
 
+    /**
+     * Cuenta las habitaciones disponibles en el inventario.
+     *
+     * @return numero total de habitaciones
+     * @throws SQLException si falla la consulta
+     */
     public int contarTotalHabitaciones() throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_TOTAL_HABITACIONES);
              ResultSet resultados = sentencia.executeQuery()) {
@@ -81,6 +87,14 @@ public class ReservaDao {
         }
     }
 
+    /**
+     * Cuenta las habitaciones ocupadas durante un periodo.
+     *
+     * @param fechaEntrada fecha de llegada solicitada
+     * @param fechaSalida fecha de salida solicitada
+     * @return numero de habitaciones con una reserva coincidente
+     * @throws SQLException si falla la consulta
+     */
     public int contarHabitacionesReservadas(LocalDate fechaEntrada, LocalDate fechaSalida) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_HABITACIONES_RESERVADAS)) {
             sentencia.setObject(1, fechaSalida);
@@ -92,6 +106,14 @@ public class ReservaDao {
         }
     }
 
+    /**
+     * Busca las habitaciones que no tienen una reserva coincidente.
+     *
+     * @param fechaEntrada fecha de llegada solicitada
+     * @param fechaSalida fecha de salida solicitada
+     * @return habitaciones libres con su precio por noche
+     * @throws SQLException si falla la consulta
+     */
     public List<HabitacionLibre> buscarHabitacionesLibres(LocalDate fechaEntrada, LocalDate fechaSalida)
             throws SQLException {
         List<HabitacionLibre> habitaciones = new ArrayList<>();
@@ -110,6 +132,17 @@ public class ReservaDao {
         return habitaciones;
     }
 
+    /**
+     * Guarda una reserva confirmada y le asigna una habitacion.
+     *
+     * @param idDni identificador del cliente
+     * @param fechaEntrada fecha de llegada
+     * @param fechaSalida fecha de salida
+     * @param importeTotal importe calculado por el servicio
+     * @param numeroHabitacion habitacion seleccionada
+     * @return identificador generado para la reserva
+     * @throws SQLException si falla alguna insercion o la transaccion
+     */
     public int crearReserva(
             String idDni,
             LocalDate fechaEntrada,
@@ -154,6 +187,13 @@ public class ReservaDao {
         }
     }
 
+    /**
+     * Recupera el historial de reservas de un cliente.
+     *
+     * @param idDni identificador del cliente
+     * @return reservas ordenadas por fecha de entrada
+     * @throws SQLException si falla la consulta
+     */
     public List<ReservaCliente> listarReservasCliente(String idDni) throws SQLException {
         List<ReservaCliente> reservas = new ArrayList<>();
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_RESERVAS_CLIENTE)) {
@@ -177,6 +217,14 @@ public class ReservaDao {
         return reservas;
     }
 
+    /**
+     * Busca una reserva concreta perteneciente a un cliente.
+     *
+     * @param idReserva identificador de la reserva
+     * @param idDni identificador del cliente propietario
+     * @return estado de la reserva, o vacio si no pertenece al cliente
+     * @throws SQLException si falla la consulta
+     */
     public Optional<EstadoReserva> buscarReservaCliente(int idReserva, String idDni) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_BUSCAR_RESERVA_CLIENTE)) {
             sentencia.setInt(1, idReserva);
@@ -194,6 +242,14 @@ public class ReservaDao {
         }
     }
 
+    /**
+     * Marca una reserva del cliente como cancelada.
+     *
+     * @param idReserva identificador de la reserva
+     * @param idDni identificador del cliente propietario
+     * @return {@code true} si se actualizo una reserva
+     * @throws SQLException si falla la actualizacion
+     */
     public boolean cancelarReserva(int idReserva, String idDni) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_CANCELAR_RESERVA)) {
             sentencia.setInt(1, idReserva);

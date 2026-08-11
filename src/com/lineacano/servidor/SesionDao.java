@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 /**
- * Acceso JDBC a las sesiones de usuario.
+ * Acceso JDBC a las sesiones persistentes de los usuarios.
  */
 public class SesionDao {
     private static final String SQL_CREAR_TABLA = """
@@ -41,6 +41,11 @@ public class SesionDao {
 
     private final BaseDeDatos baseDeDatos;
 
+    /**
+     * Crea el DAO y prepara la tabla de sesiones cuando hay base de datos.
+     *
+     * @param baseDeDatos gestor de la conexion JDBC
+     */
     public SesionDao(BaseDeDatos baseDeDatos) {
         this.baseDeDatos = baseDeDatos;
         if (baseDeDatos != null) {
@@ -52,6 +57,12 @@ public class SesionDao {
         }
     }
 
+    /**
+     * Guarda una nueva sesion.
+     *
+     * @param sesion datos de la sesion autenticada
+     * @throws SQLException si falla la insercion
+     */
     public void registrar(UsuarioSesion sesion) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_INSERTAR)) {
             sentencia.setString(1, sesion.token());
@@ -61,6 +72,13 @@ public class SesionDao {
         }
     }
 
+    /**
+     * Busca una sesion y los datos basicos de su usuario.
+     *
+     * @param token identificador de la sesion
+     * @return datos encontrados, o vacio si el token no existe
+     * @throws SQLException si falla la consulta
+     */
     public Optional<DatosSesion> buscarPorToken(String token) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_BUSCAR)) {
             sentencia.setString(1, token);
@@ -84,6 +102,13 @@ public class SesionDao {
         }
     }
 
+    /**
+     * Elimina una sesion concreta.
+     *
+     * @param token identificador de la sesion
+     * @return {@code true} si se elimino una fila
+     * @throws SQLException si falla la eliminacion
+     */
     public boolean eliminar(String token) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_ELIMINAR)) {
             sentencia.setString(1, token);
@@ -91,6 +116,12 @@ public class SesionDao {
         }
     }
 
+    /**
+     * Elimina las sesiones creadas antes de una fecha limite.
+     *
+     * @param fechaLimite instante anterior al cual una sesion se considera caducada
+     * @throws SQLException si falla la eliminacion
+     */
     public void eliminarCaducadas(Instant fechaLimite) throws SQLException {
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_ELIMINAR_CADUCADAS)) {
             sentencia.setTimestamp(1, Timestamp.from(fechaLimite));

@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Servicio con las reglas de autenticacion, sesiones y altas de usuarios.
+ * Aplica las reglas de autenticacion, sesiones y altas de usuarios.
+ * Delega la persistencia en {@link UsuarioDao} y {@link SesionDao}.
  */
 public final class ServicioAutenticacion {
     private static final Duration DURACION_MAXIMA_SESION = Duration.ofDays(7);
@@ -15,11 +16,26 @@ public final class ServicioAutenticacion {
     private final UsuarioDao usuarioDao;
     private final SesionDao sesionDao;
 
+    /**
+     * Crea el servicio con los DAO de usuarios y sesiones.
+     *
+     * @param usuarioDao acceso a los usuarios registrados
+     * @param sesionDao acceso a las sesiones persistentes
+     */
     public ServicioAutenticacion(UsuarioDao usuarioDao, SesionDao sesionDao) {
         this.usuarioDao = usuarioDao;
         this.sesionDao = sesionDao;
     }
 
+    /**
+     * Valida las credenciales y crea una sesion persistente.
+     *
+     * @param usuario correo introducido por el usuario
+     * @param contrasena contrasena en texto plano
+     * @return sesion creada con su token y rol
+     * @throws SQLException si falla el acceso a los datos
+     * @throws IllegalArgumentException si las credenciales no son validas
+     */
     public UsuarioSesion iniciarSesion(String usuario, String contrasena) throws SQLException {
         if (usuario == null || usuario.isBlank() || contrasena == null || contrasena.isBlank()) {
             throw new IllegalArgumentException("Usuario y contraseña son obligatorios.");
@@ -60,6 +76,12 @@ public final class ServicioAutenticacion {
         }
     }
 
+    /**
+     * Recupera una sesion activa y descarta las sesiones caducadas.
+     *
+     * @param token identificador enviado por el navegador
+     * @return sesion valida, o vacio si no existe o no puede utilizarse
+     */
     public Optional<UsuarioSesion> buscarPorToken(String token) {
         if (token == null || token.isBlank()) {
             return Optional.empty();
@@ -91,6 +113,14 @@ public final class ServicioAutenticacion {
         }
     }
 
+    /**
+     * Elimina la sesion asociada al token actual.
+     *
+     * @param token identificador de la sesion
+     * @return {@code true} si la sesion existia
+     * @throws SQLException si falla la eliminacion
+     * @throws IllegalArgumentException si no se recibe un token
+     */
     public boolean cerrarSesion(String token) throws SQLException {
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException("El token de sesion es obligatorio.");
@@ -98,6 +128,19 @@ public final class ServicioAutenticacion {
         return sesionDao.eliminar(token.trim());
     }
 
+    /**
+     * Valida y registra una cuenta de cliente particular.
+     *
+     * @param documento DNI o documento identificativo
+     * @param nombre nombre del cliente
+     * @param apellido primer apellido
+     * @param correo correo utilizado para acceder
+     * @param telefono telefono opcional
+     * @param contrasena contrasena inicial
+     * @return confirmacion del alta en formato JSON
+     * @throws SQLException si falla el registro
+     * @throws IllegalArgumentException si los datos no son validos o ya existen
+     */
     public String registrarNuevoUsuario(
             String documento, String nombre, String apellido, String correo,
             String telefono, String contrasena
@@ -130,6 +173,21 @@ public final class ServicioAutenticacion {
                 """.formatted(UtilJson.escapar(nombreNormalizado), UtilJson.escapar(correoNormalizado));
     }
 
+    /**
+     * Valida y registra una cuenta profesional HORECA.
+     *
+     * @param documento DNI del contacto
+     * @param nombreContacto nombre del contacto
+     * @param apellidoContacto primer apellido del contacto
+     * @param empresa nombre de la empresa
+     * @param cif identificador fiscal de la empresa
+     * @param correo correo profesional de acceso
+     * @param telefono telefono opcional
+     * @param contrasena contrasena inicial
+     * @return confirmacion del alta en formato JSON
+     * @throws SQLException si falla el registro
+     * @throws IllegalArgumentException si los datos no son validos o ya existen
+     */
     public String altaClienteHoreca(
             String documento, String nombreContacto, String apellidoContacto, String empresa,
             String cif, String correo, String telefono, String contrasena

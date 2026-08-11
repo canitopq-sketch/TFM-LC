@@ -85,6 +85,16 @@ public class PedidoDao {
         }
     }
 
+    /**
+     * Guarda un pedido y todas sus lineas en una unica transaccion.
+     *
+     * @param idDni identificador del cliente que realiza el pedido
+     * @param canal canal particular o HORECA
+     * @param total importe total calculado por el servicio
+     * @param lineas productos y cantidades del pedido
+     * @return identificador generado para el pedido
+     * @throws SQLException si falla alguna insercion o la transaccion
+     */
     public int crearPedido(String idDni, String canal, BigDecimal total, List<LineaPedido> lineas)
             throws SQLException {
         Connection conexion = conexion();
@@ -105,6 +115,13 @@ public class PedidoDao {
         }
     }
 
+    /**
+     * Recupera los pedidos y sus lineas para un cliente.
+     *
+     * @param idDni identificador del cliente
+     * @return pedidos ordenados del mas reciente al mas antiguo
+     * @throws SQLException si falla la consulta
+     */
     public List<PedidoCliente> listarPedidosCliente(String idDni) throws SQLException {
         List<PedidoCliente> pedidos = new ArrayList<>();
         try (PreparedStatement sentencia = conexion().prepareStatement(SQL_PEDIDOS_CLIENTE)) {
