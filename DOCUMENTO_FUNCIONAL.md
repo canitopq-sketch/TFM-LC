@@ -3,7 +3,7 @@
 ## Proyecto
 
 **Nombre:** Linea Cano  
-**Tipo de proyecto:** Ecosistema digital para TFM  
+**Tipo de proyecto:** Ecosistema digital para TFG
 **Ámbito:** Marca agroganadera, producto premium, hospitality, reservas, eventos y acceso profesional
 
 ## 1. Visión General
@@ -27,8 +27,8 @@ El objetivo funcional de la web es:
 - mostrar el producto premium con un lenguaje más comercial
 - permitir el acceso a usuarios registrados
 - habilitar consulta de disponibilidad y reserva
-- preparar una capa profesional para clientes HORECA
-- preparar una capa comercial y de administración para futuras gestiones internas
+- ofrecer un área profesional para clientes HORECA
+- ofrecer un área comercial para disponibilidad, reservas y altas HORECA
 
 ## 3. Líneas de Negocio Actuales
 
@@ -96,7 +96,7 @@ La línea HORECA se plantea como una capa más especializada y profesional.
 Su función es:
 
 - canalizar clientes profesionales
-- preparar el acceso privado
+- ofrecer un acceso privado diferenciado
 - segmentar restauración y hotelería
 - dejar lista la evolución hacia tarifas, catálogo profesional y relación comercial específica
 
@@ -312,7 +312,7 @@ Permite:
 - añadir productos al carrito
 - modificar cantidades
 - vaciar el carrito
-- confirmar una compra simulada
+- confirmar y guardar una compra
 - guardar el historial de compras y pedidos en MySQL
 
 Esta capa permite mostrar el flujo comercial de producto con persistencia real de pedidos y lineas de pedido.
@@ -446,7 +446,7 @@ En este momento el proyecto ya dispone de:
 - panel HORECA privado diferenciado
 - panel comercial con mapa inicial de backoffice
 - alta HORECA funcional desde administración
-- contenido alineado con el TFM
+- contenido alineado con el TFG
 
 ## 11. Pendientes Naturales de Evolución
 
@@ -473,4 +473,4 @@ Linea Cano ya no se comporta como una única landing, sino como un ecosistema di
 - eventos
 - acceso por roles
 
-Esto permite presentar una base sólida y coherente para el TFM, tanto desde el punto de vista visual como funcional.
+Esto permite presentar una base sólida y coherente para el TFG, tanto desde el punto de vista visual como funcional.

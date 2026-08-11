@@ -1,6 +1,8 @@
+# Puerto del servidor web y carpeta de las vistas.
 app.puerto=8080
 app.raizWeb=.
 
+# Conexion local a MySQL. Sustituye usuario y contrasena por los de tu equipo.
 bd.url=jdbc:mysql://localhost:3306/linea_cano?serverTimezone=Europe/Madrid&useSSL=false&allowPublicKeyRetrieval=true
 bd.usuario=root
 bd.contrasena=
