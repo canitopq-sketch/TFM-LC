@@ -158,10 +158,7 @@ if (botonConfirmarReserva) {
 }
 
 if (botonCerrarSesion) {
-    botonCerrarSesion.addEventListener("click", () => {
-        localStorage.removeItem(CLAVE_ALMACENAMIENTO);
-        window.location.href = "acceso.html";
-    });
+    botonCerrarSesion.addEventListener("click", cerrarSesion);
 }
 
 if (formularioHoreca) {
@@ -778,6 +775,37 @@ async function validarSesionEnServidor(token) {
         return await leerRespuestaJson(respuesta);
     } catch {
         return null;
+    }
+}
+
+async function cerrarSesion() {
+    if (!sesionActiva?.token) {
+        cerrarSesionPorExpiracion();
+        return;
+    }
+
+    botonCerrarSesion.disabled = true;
+    botonCerrarSesion.textContent = "Cerrando sesion...";
+
+    try {
+        const respuesta = await fetch("/api/sesion/cerrar", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "X-Linea-Token": sesionActiva.token
+            }
+        });
+
+        if (!respuesta.ok) {
+            throw new Error("No se pudo cerrar la sesion en el servidor.");
+        }
+
+        localStorage.removeItem(CLAVE_ALMACENAMIENTO);
+        sesionActiva = null;
+        window.location.href = "acceso.html";
+    } catch {
+        botonCerrarSesion.disabled = false;
+        botonCerrarSesion.textContent = "Cerrar sesion";
     }
 }
 

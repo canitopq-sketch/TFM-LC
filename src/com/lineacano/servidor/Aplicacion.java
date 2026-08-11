@@ -49,6 +49,7 @@ public final class Aplicacion {
         servidor.createContext("/api/salud", intercambio -> escribirJson(intercambio, 200, "{\"estado\":\"ok\"}"));
         servidor.createContext("/api/sesion/iniciar", new ControladorInicioSesion(servicioAutenticacion));
         servidor.createContext("/api/sesion/validar", new ControladorValidacionSesion(servicioAutenticacion));
+        servidor.createContext("/api/sesion/cerrar", new ControladorCierreSesion(servicioAutenticacion));
         servidor.createContext("/api/usuarios/registro", new ControladorRegistroUsuario(servicioAutenticacion));
         servidor.createContext("/api/admin/clientes-horeca", new ControladorAltaHoreca(servicioAutenticacion));
         servidor.createContext("/api/disponibilidad", new ControladorDisponibilidad(servicioReservas, servicioAutenticacion));
@@ -120,6 +121,33 @@ public final class Aplicacion {
                 escribirJson(intercambio, 401, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
             } catch (Exception excepcion) {
                 escribirJson(intercambio, 500, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            }
+        }
+    }
+
+    private static final class ControladorCierreSesion implements HttpHandler {
+        private final ServicioAutenticacion servicioAutenticacion;
+
+        private ControladorCierreSesion(ServicioAutenticacion servicioAutenticacion) {
+            this.servicioAutenticacion = servicioAutenticacion;
+        }
+
+        @Override
+        public void handle(HttpExchange intercambio) throws IOException {
+            if (!"POST".equalsIgnoreCase(intercambio.getRequestMethod())) {
+                escribirJson(intercambio, 405, "{\"error\":\"Metodo no permitido\"}");
+                return;
+            }
+
+            String token = intercambio.getRequestHeaders().getFirst("X-Linea-Token");
+
+            try {
+                servicioAutenticacion.cerrarSesion(token);
+                escribirJson(intercambio, 200, "{\"mensaje\":\"Sesion cerrada correctamente.\"}");
+            } catch (IllegalArgumentException excepcion) {
+                escribirJson(intercambio, 400, "{\"error\":\"" + UtilJson.escapar(excepcion.getMessage()) + "\"}");
+            } catch (Exception excepcion) {
+                escribirJson(intercambio, 500, "{\"error\":\"No se pudo cerrar la sesion.\"}");
             }
         }
     }

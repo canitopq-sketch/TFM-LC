@@ -232,6 +232,24 @@ public final class ServicioAutenticacion {
     }
 
     /**
+     * Elimina la sesion asociada al token enviado por el navegador.
+     *
+     * @param token identificador de la sesion que se desea cerrar
+     * @return {@code true} si existia una sesion y se ha eliminado
+     * @throws SQLException si falla la eliminacion en la base de datos
+     */
+    public boolean cerrarSesion(String token) throws SQLException {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("El token de sesion es obligatorio.");
+        }
+
+        try (PreparedStatement sentencia = baseDeDatos.obtenerConexion().prepareStatement(SQL_ELIMINAR_SESION)) {
+            sentencia.setString(1, token.trim());
+            return sentencia.executeUpdate() > 0;
+        }
+    }
+
+    /**
      * Registra un nuevo usuario con rol de cliente registrado.
      *
      * @param documento DNI o documento identificativo
