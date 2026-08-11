@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area comercial | Linea Cano</title>
+    <title>Área comercial | Linea Cano</title>
     <meta name="description" content="Panel comercial para seguimiento de disponibilidad y reservas de Linea Cano.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,36 +16,36 @@
             <img class="brand-logo" src="imagenes/Logo_LineaCano.jpg" alt="Logo de Linea Cano">
         </a>
 
-        <nav class="site-nav" aria-label="Navegacion privada">
+        <nav class="site-nav" aria-label="Navegación privada">
             <a href="#panel" aria-current="true">Panel</a>
             <a href="#reserva">Disponibilidad</a>
             <a href="#horeca-admin">HORECA</a>
             <a href="#seguimiento">Seguimiento</a>
-            <a href="index.html">Web publica</a>
+            <a href="index.html">Web pública</a>
         </nav>
 
-        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesion</button>
+        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesión</button>
     </header>
 
     <main class="private-shell" id="panel">
         <section class="section private-hero">
             <div class="section-heading">
-                <p class="eyebrow">Area comercial</p>
-                <h2 id="titulo-pagina-privada">Consulta operativa, reservas y siguiente capa de gestion comercial.</h2>
+                <p class="eyebrow">Área comercial</p>
+                <h1 id="titulo-pagina-privada">Disponibilidad, reservas y altas de clientes HORECA.</h1>
             </div>
 
             <div class="client-overview">
                 <article class="private-card private-card-dark">
-                    <span class="role-kicker">Sesion activa</span>
+                    <span class="role-kicker">Sesión activa</span>
                     <h3 id="nombre-usuario-privado">Perfil comercial</h3>
                     <p class="auth-copy" id="texto-usuario-privado">
-                        Este frontal prepara el salto a agenda, eventos, HORECA y seguimiento de oportunidades.
+                        Desde este panel puedes consultar la ocupación, confirmar reservas y crear clientes HORECA.
                     </p>
 
                     <div class="session-status" id="estado-sesion" data-state="maestro">
                         <p class="availability-label">Estado de acceso</p>
                         <strong class="availability-title">Acceso comercial autorizado</strong>
-                        <p class="availability-text">La sesion comercial puede consultar ocupacion y confirmar reservas.</p>
+                        <p class="availability-text">La sesión comercial puede consultar ocupación y confirmar reservas.</p>
                     </div>
                 </article>
 
@@ -53,17 +53,17 @@
                     <a class="client-action" href="#reserva">
                         <span>01</span>
                         <strong>Disponibilidad</strong>
-                        <small>Consulta ocupacion real y registra reservas operativas.</small>
+                        <small>Consulta ocupación real y registra reservas.</small>
                     </a>
                     <a class="client-action" href="#horeca-admin">
                         <span>02</span>
                         <strong>Alta HORECA</strong>
-                        <small>Crea cuentas profesionales y segmenta clientes B2B.</small>
+                        <small>Crea cuentas para clientes profesionales.</small>
                     </a>
                     <a class="client-action" href="#seguimiento">
                         <span>03</span>
                         <strong>Seguimiento</strong>
-                        <small>Base para CRM, eventos, pedidos y oportunidades.</small>
+                        <small>Revisa las principales tareas del área comercial.</small>
                     </a>
                 </article>
             </div>
@@ -73,10 +73,9 @@
             <div class="reservation-layout">
                 <article class="reserve-card">
                     <p class="eyebrow">Control inicial</p>
-                    <h2>El frontal comercial consulta disponibilidad y puede registrar reservas para validar el flujo completo.</h2>
+                    <h2>Consulta la disponibilidad y registra reservas desde el panel comercial.</h2>
                     <p>
-                        Este entorno sirve como primera capa operativa para revisar ocupacion, confirmar una reserva y preparar
-                        futuras pantallas de gestion interna.
+                        Este entorno permite revisar la ocupación y confirmar una reserva para el cliente.
                     </p>
                 </article>
 
@@ -96,12 +95,12 @@
                             <input id="fecha-salida" name="fechaSalida" type="date" required>
                         </label>
                         <label>
-                            Huespedes
+                            Huéspedes
                             <select id="huespedes" name="huespedes">
-                                <option value="2">2 huespedes</option>
-                                <option value="4">4 huespedes</option>
-                                <option value="6">6 huespedes</option>
-                                <option value="8">8 huespedes</option>
+                                <option value="2">2 huéspedes</option>
+                                <option value="4">4 huéspedes</option>
+                                <option value="6">6 huéspedes</option>
+                                <option value="8">8 huéspedes</option>
                             </select>
                         </label>
                         <button class="button button-primary booking-submit" type="submit">Consultar disponibilidad</button>
@@ -110,8 +109,8 @@
 
                     <div class="availability-card" id="tarjeta-disponibilidad" aria-live="polite">
                         <p class="availability-label">Estado actual</p>
-                        <strong class="availability-title">Area comercial lista</strong>
-                        <p class="availability-text">Selecciona fechas para consultar ocupacion real y avanzar con la reserva.</p>
+                        <strong class="availability-title">Área comercial lista</strong>
+                        <p class="availability-text">Selecciona fechas para consultar la ocupación real y avanzar con la reserva.</p>
                     </div>
 
                     <div class="management-preview" id="resumen-reserva">
@@ -134,8 +133,8 @@
 
         <section class="section" id="horeca-admin">
             <div class="section-heading">
-                <p class="eyebrow">Administracion</p>
-                <h2>Alta manual de clientes HORECA para activar acceso profesional desde el panel maestro.</h2>
+                <p class="eyebrow">Administración</p>
+                <h2>Alta de clientes HORECA desde el panel maestro.</h2>
             </div>
 
             <div class="private-grid">
@@ -143,8 +142,7 @@
                     <span class="role-kicker">Alta HORECA</span>
                     <h3>Crea cuentas profesionales para restaurantes, hoteles y distribuidores de confianza.</h3>
                     <p class="private-text">
-                        Este formulario da de alta el contacto principal, genera sus credenciales y lo vincula a una ficha
-                        profesional HORECA dentro de la base de datos.
+                        Completa los datos del contacto y de su empresa para crear una cuenta profesional HORECA.
                     </p>
 
                     <form class="register-form" id="formulario-horeca">
@@ -173,15 +171,15 @@
                             <input id="horeca-correo" type="email" placeholder="compras@empresa.com" required>
                         </label>
                         <label>
-                            Telefono
+                            Teléfono
                             <input id="horeca-telefono" type="tel" placeholder="+34 600 000 000">
                         </label>
                         <label>
-                            Contrasena inicial
+                            Contraseña inicial
                             <input
                                 id="horeca-contrasena"
                                 type="password"
-                                placeholder="Maximo 10 caracteres"
+                                placeholder="Máximo 10 caracteres"
                                 maxlength="10"
                                 pattern="[A-Za-z0-9]{1,10}"
                                 title="La contraseña debe tener un máximo de 10 caracteres alfanuméricos."
@@ -194,10 +192,9 @@
 
                 <article class="private-card">
                     <span class="role-kicker">Estado</span>
-                    <h3>Seguimiento del alta profesional desde el frontal de administracion.</h3>
+                    <h3>Seguimiento del alta profesional desde el panel de administración.</h3>
                     <p class="private-text">
-                        Al completar el alta, el sistema genera un usuario con rol HORECA y deja el acceso listo para su
-                        siguiente evolucion funcional.
+                        Al completar el alta, la cuenta HORECA quedará lista para utilizarse.
                     </p>
 
                     <div class="availability-card" id="estado-horeca" data-state="bloqueado">
@@ -211,34 +208,34 @@
 
         <section class="section" id="seguimiento">
             <div class="section-heading">
-                <p class="eyebrow">Backoffice</p>
-                <h2>Mapa inicial de gestion interna para las siguientes iteraciones del proyecto.</h2>
+                <p class="eyebrow">Gestión interna</p>
+                <h2>Resumen de las principales tareas comerciales.</h2>
             </div>
 
             <div class="admin-module-grid">
                 <article class="admin-module-card">
                     <span class="role-kicker">Reservas</span>
-                    <h3>Ocupacion y estancias</h3>
-                    <p>Gestion avanzada de reservas, cambios de fecha, habitaciones y estados.</p>
-                    <strong>Estado: base funcional</strong>
+                    <h3>Ocupación y estancias</h3>
+                    <p>Consulta la disponibilidad y confirma reservas para los clientes.</p>
+                    <strong>Disponible desde este panel</strong>
                 </article>
                 <article class="admin-module-card">
                     <span class="role-kicker">HORECA</span>
                     <h3>Cuentas profesionales</h3>
-                    <p>Alta de empresas, catalogo privado, condiciones y pedidos recurrentes.</p>
-                    <strong>Estado: alta funcional</strong>
+                    <p>Crea cuentas profesionales para restaurantes, hoteles y distribuidores.</p>
+                    <strong>Disponible desde este panel</strong>
                 </article>
                 <article class="admin-module-card">
-                    <span class="role-kicker">Eventos</span>
-                    <h3>MICE y bodas</h3>
-                    <p>Solicitudes, presupuestos, calendario de salones y dossieres comerciales.</p>
-                    <strong>Estado: roadmap</strong>
+                    <span class="role-kicker">Atención comercial</span>
+                    <h3>Consultas de clientes</h3>
+                    <p>Atiende las consultas relacionadas con estancias, producto y eventos.</p>
+                    <strong>Seguimiento directo</strong>
                 </article>
                 <article class="admin-module-card">
                     <span class="role-kicker">Producto</span>
-                    <h3>Pedidos y stock</h3>
-                    <p>Catalogo, compras, historico, preparacion y futura conexion con inventario.</p>
-                    <strong>Estado: prototipo</strong>
+                    <h3>Pedidos profesionales</h3>
+                    <p>Los clientes HORECA pueden preparar pedidos y consultar su historial.</p>
+                    <strong>Disponible en el área HORECA</strong>
                 </article>
             </div>
         </section>

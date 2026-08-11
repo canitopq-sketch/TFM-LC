@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area cliente | Linea Cano</title>
+    <title>Área de cliente | Linea Cano</title>
     <meta name="description" content="Panel de cliente registrado para disponibilidad y reservas de Linea Cano.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,36 +16,36 @@
             <img class="brand-logo" src="imagenes/Logo_LineaCano.jpg" alt="Logo de Linea Cano">
         </a>
 
-        <nav class="site-nav" aria-label="Navegacion privada">
+        <nav class="site-nav" aria-label="Navegación privada">
             <a href="#panel" aria-current="true">Panel</a>
             <a href="#reserva">Reserva</a>
             <a href="#tienda">Tienda</a>
             <a href="#compras">Compras</a>
-            <a href="index.html">Web publica</a>
+            <a href="index.html">Web pública</a>
         </nav>
 
-        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesion</button>
+        <button class="header-cta private-logout" id="boton-cerrar-sesion" type="button">Cerrar sesión</button>
     </header>
 
     <main class="private-shell" id="panel">
         <section class="section private-hero">
             <div class="section-heading">
-                <p class="eyebrow">Area cliente</p>
-                <h2 id="titulo-pagina-privada">Panel privado para reservar estancia, comprar producto y revisar tu actividad.</h2>
+                <p class="eyebrow">Área de cliente</p>
+                <h1 id="titulo-pagina-privada">Reserva estancias, compra productos y revisa tu actividad.</h1>
             </div>
 
             <div class="client-overview">
                 <article class="private-card private-card-dark">
-                    <span class="role-kicker">Sesion activa</span>
+                    <span class="role-kicker">Sesión activa</span>
                     <h3 id="nombre-usuario-privado">Cliente registrado</h3>
                     <p class="auth-copy" id="texto-usuario-privado">
-                        Desde este frontal puedes consultar el inventario real y confirmar tu reserva en la finca.
+                        Desde este panel puedes consultar el inventario real y confirmar tu reserva en la finca.
                     </p>
 
                     <div class="session-status" id="estado-sesion" data-state="registrado">
                         <p class="availability-label">Estado de acceso</p>
                         <strong class="availability-title">Acceso autorizado</strong>
-                        <p class="availability-text">La sesion del cliente esta lista para operar con disponibilidad real.</p>
+                        <p class="availability-text">La sesión del cliente está lista para consultar la disponibilidad real.</p>
                     </div>
                 </article>
 
@@ -58,7 +58,7 @@
                     <a class="client-action" href="#tienda">
                         <span>02</span>
                         <strong>Comprar producto</strong>
-                        <small>Anade iberico, buey o despensa al carrito.</small>
+                        <small>Añade ibérico, buey o despensa al carrito.</small>
                     </a>
                     <a class="client-action" href="#compras">
                         <span>03</span>
@@ -73,10 +73,10 @@
             <div class="reservation-layout">
                 <article class="reserve-card">
                     <p class="eyebrow">Reserva</p>
-                    <h2>Consulta fechas reales y confirma tu estancia desde el frontal de cliente.</h2>
+                    <h2>Elige tus fechas y confirma tu estancia.</h2>
                     <p>
-                        Este panel conecta con la base de datos del proyecto para mostrar la disponibilidad real y registrar
-                        una reserva funcional sobre el sistema.
+                        Indica las fechas de llegada y salida para consultar las habitaciones disponibles.
+                        Después podrás revisar la información y confirmar la reserva.
                     </p>
                 </article>
 
@@ -96,12 +96,12 @@
                             <input id="fecha-salida" name="fechaSalida" type="date" required>
                         </label>
                         <label>
-                            Huespedes
+                            Huéspedes
                             <select id="huespedes" name="huespedes">
-                                <option value="2">2 huespedes</option>
-                                <option value="4">4 huespedes</option>
-                                <option value="6">6 huespedes</option>
-                                <option value="8">8 huespedes</option>
+                                <option value="2">2 huéspedes</option>
+                                <option value="4">4 huéspedes</option>
+                                <option value="6">6 huéspedes</option>
+                                <option value="8">8 huéspedes</option>
                             </select>
                         </label>
                         <button class="button button-primary booking-submit" type="submit">Consultar disponibilidad</button>
@@ -135,20 +135,20 @@
         <section class="section shop-section" id="tienda">
             <div class="section-heading">
                 <p class="eyebrow">Tienda privada</p>
-                <h2>Producto Linea Cano para completar la experiencia desde el area cliente.</h2>
+                <h2>Productos Linea Cano disponibles en el área de cliente.</h2>
             </div>
 
             <div class="shop-layout">
                 <div class="product-shop-grid">
                     <article class="shop-product-card">
-                        <img src="imagenes/Iberico.png" alt="Producto iberico Linea Cano">
+                        <img src="imagenes/Iberico.png" alt="Producto ibérico Linea Cano">
                         <div>
-                            <span class="role-kicker">Iberico</span>
-                            <h3>Seleccion iberica de montanera</h3>
-                            <p>Lote degustacion con jamon, lomo y embutido de origen propio.</p>
+                            <span class="role-kicker">Ibérico</span>
+                            <h3>Selección ibérica de montanera</h3>
+                            <p>Lote degustación con jamón, lomo y embutido de origen propio.</p>
                             <div class="shop-product-footer">
                                 <strong>89,00 €</strong>
-                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="iberico">Anadir</button>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="iberico">Añadir</button>
                             </div>
                         </div>
                     </article>
@@ -158,10 +158,10 @@
                         <div>
                             <span class="role-kicker">Buey</span>
                             <h3>Corte premium madurado</h3>
-                            <p>Pieza seleccionada para consumo gourmet con maduracion controlada.</p>
+                            <p>Pieza seleccionada para consumo gastronómico con maduración controlada.</p>
                             <div class="shop-product-footer">
                                 <strong>126,00 €</strong>
-                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="buey">Anadir</button>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="buey">Añadir</button>
                             </div>
                         </div>
                     </article>
@@ -171,10 +171,10 @@
                         <div>
                             <span class="role-kicker">Despensa</span>
                             <h3>Cesta fresca de temporada</h3>
-                            <p>Huerta ecologica, complementos de finca y producto de proximidad.</p>
+                            <p>Huerta ecológica, complementos de finca y producto de proximidad.</p>
                             <div class="shop-product-footer">
                                 <strong>42,00 €</strong>
-                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="despensa">Anadir</button>
+                                <button class="button button-primary" type="button" data-action="agregar-producto" data-producto="despensa">Añadir</button>
                             </div>
                         </div>
                     </article>
@@ -195,7 +195,7 @@
                     <div class="availability-card" id="estado-carrito" data-state="bloqueado">
                         <p class="availability-label">Estado del carrito</p>
                         <strong class="availability-title">Sin productos</strong>
-                        <p class="availability-text">Anade productos para preparar un pedido de prueba.</p>
+                        <p class="availability-text">Añade productos para preparar un pedido.</p>
                     </div>
                 </aside>
             </div>
@@ -204,15 +204,15 @@
         <section class="section" id="compras">
             <div class="section-heading">
                 <p class="eyebrow">Historial</p>
-                <h2>Consulta tus reservas y compras desde una vista unica de actividad.</h2>
+                <h2>Consulta tus reservas y compras en una única vista.</h2>
             </div>
 
             <div class="private-grid">
                 <article class="private-card">
-                    <span class="role-kicker">Historico</span>
-                    <h3>Tus estancias confirmadas quedan visibles en este resumen operativo.</h3>
+                    <span class="role-kicker">Histórico</span>
+                    <h3>Consulta aquí tus estancias y su estado.</h3>
                     <p class="private-text">
-                        Esta seccion permite revisar fechas, estado, habitacion asignada e importe estimado de cada reserva
+                        Esta sección permite revisar fechas, estado, habitación asignada e importe estimado de cada reserva
                         vinculada a tu usuario.
                     </p>
                     <button class="button button-secondary booking-submit" id="boton-actualizar-reservas" type="button">Actualizar mis reservas</button>
@@ -222,7 +222,7 @@
                     <div class="availability-card" id="estado-reservas" data-state="bloqueado">
                         <p class="availability-label">Estado de reservas</p>
                         <strong class="availability-title">Pendiente de consulta</strong>
-                        <p class="availability-text">Pulsa en actualizar para cargar el historico del cliente autenticado.</p>
+                        <p class="availability-text">Pulsa en actualizar para cargar el histórico del cliente autenticado.</p>
                     </div>
                 </article>
             </div>
@@ -232,7 +232,7 @@
             <div class="purchase-history-wrap">
                 <div class="section-heading compact-heading">
                     <p class="eyebrow">Mis compras</p>
-                    <h2>Pedidos de producto guardados en este navegador.</h2>
+                    <h2>Consulta tus pedidos de productos.</h2>
                 </div>
                 <div class="reservation-history" id="historial-compras" aria-live="polite"></div>
             </div>

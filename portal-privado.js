@@ -27,8 +27,8 @@ const enlacesNavegacionPrivada = document.querySelectorAll(".site-nav a[href^='#
 const CLAVE_ALMACENAMIENTO = "linea_cano_sesion";
 const CATALOGO_PRODUCTOS = {
     iberico: {
-        nombre: "Seleccion iberica de montanera",
-        categoria: "Iberico",
+        nombre: "Selección ibérica de montanera",
+        categoria: "Ibérico",
         precio: 89
     },
     buey: {
@@ -136,7 +136,7 @@ if (botonConfirmarReserva) {
 
             renderizarDisponibilidad(
                 datos.titulo,
-                `${datos.mensaje} Estancia del ${formatearFecha(datos.fechaEntrada)} al ${formatearFecha(datos.fechaSalida)}. Habitacion ${datos.habitacionAsignada}. Reserva ${datos.idReserva}. Importe estimado ${formatearImporte(datos.importeTotal)}.`,
+                `${datos.mensaje} Estancia del ${formatearFecha(datos.fechaEntrada)} al ${formatearFecha(datos.fechaSalida)}. Habitación ${datos.habitacionAsignada}. Reserva ${datos.idReserva}. Importe estimado ${formatearImporte(datos.importeTotal)}.`,
                 "disponible"
             );
 
@@ -179,8 +179,8 @@ if (formularioHoreca) {
         if (!/^[A-Za-z0-9]{1,10}$/.test(datosFormulario.contrasena)) {
             renderizarEstadoHoreca(
                 "aviso",
-                "Contrasena no valida",
-                "La contrasena inicial debe tener un maximo de 10 caracteres alfanumericos."
+                "Contraseña no válida",
+                "La contraseña inicial debe tener un máximo de 10 caracteres alfanuméricos."
             );
             document.querySelector("#horeca-contrasena").focus();
             return;
@@ -244,7 +244,7 @@ if (botonVaciarCarrito) {
     botonVaciarCarrito.addEventListener("click", () => {
         guardarCarrito([]);
         renderizarCarrito();
-        renderizarEstadoCarrito("bloqueado", "Carrito vacio", "El pedido actual se ha vaciado correctamente.");
+        renderizarEstadoCarrito("bloqueado", "Carrito vacío", "El pedido actual se ha vaciado correctamente.");
     });
 }
 
@@ -314,16 +314,16 @@ function protegerPagina() {
     nombrePrivado.textContent = sesionActiva.nombreVisible;
 
     if (sesionActiva.rol === "maestro") {
-        tituloPrivado.textContent = "Frontal comercial con disponibilidad real, reserva y base para gestion futura.";
-        textoPrivado.textContent = "Desde este entorno comercial puedes validar ocupacion, confirmar reservas y preparar la siguiente capa de operativa.";
+        tituloPrivado.textContent = "Disponibilidad, reservas y altas de clientes HORECA.";
+        textoPrivado.textContent = "Desde este panel puedes consultar la ocupación, confirmar reservas y crear clientes HORECA.";
         estadoSesion.dataset.state = "maestro";
     } else if (sesionActiva.rol === "horeca") {
-        tituloPrivado.textContent = "Panel profesional HORECA con catalogo, pedidos y relacion comercial.";
-        textoPrivado.textContent = "Este entorno separa el canal profesional para trabajar producto, condiciones, pedidos recurrentes y contacto comercial.";
+        tituloPrivado.textContent = "Catálogo, pedidos y relación comercial para profesionales HORECA.";
+        textoPrivado.textContent = "Desde este panel profesional puedes consultar productos, preparar pedidos y revisar su historial.";
         estadoSesion.dataset.state = "horeca";
     } else {
-        tituloPrivado.textContent = "Panel privado para reservar estancia, comprar producto y revisar tu actividad.";
-        textoPrivado.textContent = "Desde este entorno puedes confirmar fechas, preparar pedidos de producto y consultar tu historial operativo.";
+        tituloPrivado.textContent = "Reserva estancias, compra productos y revisa tu actividad.";
+        textoPrivado.textContent = "Desde este entorno puedes confirmar fechas, preparar pedidos de producto y consultar tu historial.";
         estadoSesion.dataset.state = "registrado";
     }
 }
@@ -375,7 +375,7 @@ async function cargarMisReservas() {
         return;
     }
 
-    renderizarEstadoReservas("bloqueado", "Cargando reservas", "Consultando el historico real asociado al cliente.");
+    renderizarEstadoReservas("bloqueado", "Cargando reservas", "Consultando el histórico asociado al cliente.");
 
     try {
         const respuesta = await fetch("/api/reservas/mis-reservas", {
@@ -393,20 +393,20 @@ async function cargarMisReservas() {
         const datos = await leerRespuestaJson(respuesta);
 
         if (!respuesta.ok) {
-            throw new Error(datos.error || "No se pudo cargar el historico de reservas.");
+            throw new Error(datos.error || "No se pudo cargar el histórico de reservas.");
         }
 
         renderizarListaReservas(datos.reservas || []);
         renderizarEstadoReservas(
             "disponible",
-            "Historico cargado",
+            "Histórico cargado",
             `Se han localizado ${datos.total || 0} reservas vinculadas a tu usuario.`
         );
     } catch (error) {
         renderizarEstadoReservas(
             "aviso",
-            "No se pudo cargar el historico",
-            error.message || "Intentalo de nuevo en unos segundos."
+            "No se pudo cargar el histórico",
+            error.message || "Inténtalo de nuevo en unos segundos."
         );
         historialReservas.innerHTML = "";
     }
@@ -438,7 +438,7 @@ function renderizarListaReservas(reservas) {
             <article class="history-card" data-reserva="${reserva.idReserva}">
                 <p class="availability-label">Reserva ${reserva.idReserva}</p>
                 <h3>${formatearFecha(reserva.fechaEntrada)} al ${formatearFecha(reserva.fechaSalida)}</h3>
-                <p class="history-meta">Estado: ${reserva.estado} · Habitacion: ${reserva.habitacionAsignada ?? "Sin asignar"} · Importe: ${formatearImporte(reserva.importeTotal) || "Pendiente"}</p>
+                <p class="history-meta">Estado: ${reserva.estado} · Habitación: ${reserva.habitacionAsignada ?? "Sin asignar"} · Importe: ${formatearImporte(reserva.importeTotal) || "Pendiente"}</p>
                 ${botonCancelar}
             </article>
         `;
@@ -491,7 +491,7 @@ function renderizarCarrito() {
     if (carrito.length === 0) {
         listaCarrito.innerHTML = `
             <article class="cart-empty">
-                <strong>Carrito vacio</strong>
+                <strong>Carrito vacío</strong>
                 <p>Selecciona productos de la tienda privada.</p>
             </article>
         `;
@@ -552,7 +552,7 @@ async function confirmarCompra() {
     const carrito = cargarCarrito();
 
     if (carrito.length === 0) {
-        renderizarEstadoCarrito("aviso", "Carrito vacio", "Anade al menos un producto antes de confirmar la compra.");
+        renderizarEstadoCarrito("aviso", "Carrito vacío", "Añade al menos un producto antes de confirmar la compra.");
         return;
     }
 
@@ -563,7 +563,7 @@ async function confirmarCompra() {
             botonConfirmarCompra.disabled = true;
         }
 
-        renderizarEstadoCarrito("bloqueado", "Guardando pedido", "Registrando el pedido en la base de datos.");
+        renderizarEstadoCarrito("bloqueado", "Confirmando pedido", "Estamos preparando tu pedido.");
 
         const respuesta = await fetch("/api/pedidos", {
             method: "POST",
@@ -600,7 +600,7 @@ async function confirmarCompra() {
         renderizarEstadoCarrito(
             "aviso",
             "Pedido no registrado",
-            error.message || "No se ha podido guardar el pedido en la base de datos."
+            error.message || "No se ha podido confirmar el pedido."
         );
     } finally {
         renderizarCarrito();
@@ -615,7 +615,7 @@ async function cargarHistorialComprasServidor() {
     historialCompras.innerHTML = `
         <article class="history-card history-card-empty">
             <strong>Cargando historial</strong>
-            <p>Consultando pedidos guardados en la base de datos.</p>
+            <p>Consultando tu historial de pedidos.</p>
         </article>
     `;
 
@@ -643,7 +643,7 @@ async function cargarHistorialComprasServidor() {
         historialCompras.innerHTML = `
             <article class="history-card history-card-empty">
                 <strong>No se pudo cargar el historial</strong>
-                <p>${error.message || "Intentalo de nuevo en unos segundos."}</p>
+                <p>${error.message || "Inténtalo de nuevo en unos segundos."}</p>
             </article>
         `;
     }
@@ -658,7 +658,7 @@ function renderizarHistorialCompras(historial) {
         historialCompras.innerHTML = `
             <article class="history-card history-card-empty">
                 <strong>No hay compras registradas</strong>
-                <p>Los pedidos confirmados desde el carrito apareceran en este historial real.</p>
+                <p>Los pedidos confirmados desde el carrito aparecerán en este historial.</p>
             </article>
         `;
         return;
@@ -722,7 +722,7 @@ async function cancelarReservaCliente(idReserva) {
         return;
     }
 
-    renderizarEstadoReservas("bloqueado", "Cancelando reserva", `Procesando la cancelacion de la reserva ${idReserva}.`);
+    renderizarEstadoReservas("bloqueado", "Cancelando reserva", `Procesando la cancelación de la reserva ${idReserva}.`);
 
     try {
         const respuesta = await fetch("/api/reservas/cancelar", {
@@ -785,7 +785,7 @@ async function cerrarSesion() {
     }
 
     botonCerrarSesion.disabled = true;
-    botonCerrarSesion.textContent = "Cerrando sesion...";
+    botonCerrarSesion.textContent = "Cerrando sesión...";
 
     try {
         const respuesta = await fetch("/api/sesion/cerrar", {
@@ -797,7 +797,7 @@ async function cerrarSesion() {
         });
 
         if (!respuesta.ok) {
-            throw new Error("No se pudo cerrar la sesion en el servidor.");
+            throw new Error("No se pudo cerrar la sesión.");
         }
 
         localStorage.removeItem(CLAVE_ALMACENAMIENTO);
@@ -805,7 +805,7 @@ async function cerrarSesion() {
         window.location.href = "acceso.html";
     } catch {
         botonCerrarSesion.disabled = false;
-        botonCerrarSesion.textContent = "Cerrar sesion";
+        botonCerrarSesion.textContent = "Cerrar sesión";
     }
 }
 
@@ -814,13 +814,13 @@ async function leerRespuestaJson(respuesta) {
     const cuerpoTexto = await respuesta.text();
 
     if (!tipoContenido.includes("application/json")) {
-        throw new Error("El servidor no ha devuelto una respuesta JSON valida. Recarga la web e intentalo de nuevo.");
+        throw new Error("No hemos podido completar la solicitud. Recarga la página e inténtalo de nuevo.");
     }
 
     try {
         return JSON.parse(cuerpoTexto);
     } catch {
-        throw new Error("La respuesta del servidor no se ha podido interpretar correctamente.");
+        throw new Error("No hemos podido completar la solicitud. Inténtalo de nuevo.");
     }
 }
 
@@ -861,7 +861,7 @@ function fechasSonValidas() {
     const numeroNoches = Math.round((fechaSalida - fechaEntrada) / 86400000);
 
     if (numeroNoches <= 0) {
-        renderizarDisponibilidad("Rango invalido", "La fecha de salida debe ser posterior a la fecha de llegada.", "aviso");
+        renderizarDisponibilidad("Rango no válido", "La fecha de salida debe ser posterior a la fecha de llegada.", "aviso");
         return false;
     }
 

@@ -235,6 +235,7 @@ img {
 }
 
 .hero h1,
+.section-heading h1,
 .section-heading h2,
 .hero-card h2,
 .product-copy h3,
@@ -689,6 +690,7 @@ img {
     max-width: 54rem;
 }
 
+.section-heading h1,
 .section-heading h2 {
     font-size: clamp(2.55rem, 4.5vw, 4rem);
     line-height: 0.98;
@@ -2002,6 +2004,7 @@ img {
     }
 
     .hero h1,
+    .section-heading h1,
     .section-heading h2,
     .reserve-card h2 {
         line-height: 1;

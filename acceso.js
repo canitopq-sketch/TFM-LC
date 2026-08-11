@@ -24,8 +24,8 @@ formularioAcceso.addEventListener("submit", async (evento) => {
     if (!contrasenaValida) {
         renderizarEstadoSesion(
             "aviso",
-            "Contrasena no valida",
-            "La contrasena debe tener un maximo de 10 caracteres alfanumericos."
+            "Contraseña no válida",
+            "La contraseña debe tener un máximo de 10 caracteres alfanuméricos."
         );
         campoContrasena.focus();
         return;
@@ -47,18 +47,18 @@ formularioAcceso.addEventListener("submit", async (evento) => {
         const datos = await leerRespuestaJson(respuesta);
 
         if (!respuesta.ok) {
-            throw new Error(datos.error || "No se pudo iniciar sesion.");
+            throw new Error(datos.error || "No se pudo iniciar sesión.");
         }
 
         localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(datos));
-        renderizarEstadoSesion("disponible", "Acceso concedido", "Redirigiendo al frontal correspondiente...");
+        renderizarEstadoSesion("disponible", "Acceso concedido", "Redirigiendo al panel correspondiente...");
         formularioAcceso.reset();
         window.setTimeout(() => redirigirSegunPerfil(datos.rol), 450);
     } catch (error) {
         renderizarEstadoSesion(
             "aviso",
             "Acceso denegado",
-            error.message || "Usuario o contrasena incorrectos."
+            error.message || "Usuario o contraseña incorrectos."
         );
     }
 });
@@ -72,8 +72,8 @@ formularioRegistro.addEventListener("submit", async (evento) => {
     if (!contrasenaValida) {
         renderizarEstadoRegistro(
             "aviso",
-            "Contrasena no valida",
-            "La contrasena debe tener un maximo de 10 caracteres alfanumericos."
+            "Contraseña no válida",
+            "La contraseña debe tener un máximo de 10 caracteres alfanuméricos."
         );
         campoRegistroContrasena.focus();
         return;
@@ -105,7 +105,7 @@ formularioRegistro.addEventListener("submit", async (evento) => {
         renderizarEstadoRegistro(
             "disponible",
             datos.titulo || "Registro completado",
-            `${datos.mensaje} Ya puedes iniciar sesion con tu correo y contrasena.`
+            `${datos.mensaje} Ya puedes iniciar sesión con tu correo y contraseña.`
         );
         formularioRegistro.reset();
     } catch (error) {
@@ -141,7 +141,7 @@ async function inicializarSesionGuardada() {
         });
 
         if (!respuesta.ok) {
-            throw new Error("La sesion ya no es valida.");
+            throw new Error("La sesión ya no es válida.");
         }
 
         const datos = await leerRespuestaJson(respuesta);
@@ -157,13 +157,13 @@ async function leerRespuestaJson(respuesta) {
     const cuerpoTexto = await respuesta.text();
 
     if (!tipoContenido.includes("application/json")) {
-        throw new Error("El servidor no ha devuelto una respuesta JSON valida. Recarga la web e intentalo de nuevo.");
+        throw new Error("No hemos podido completar la solicitud. Recarga la página e inténtalo de nuevo.");
     }
 
     try {
         return JSON.parse(cuerpoTexto);
     } catch {
-        throw new Error("La respuesta del servidor no se ha podido interpretar correctamente.");
+        throw new Error("No hemos podido completar la solicitud. Inténtalo de nuevo.");
     }
 }
 
