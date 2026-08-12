@@ -56,6 +56,16 @@ Estas pruebas comprueban conjuntamente servicios, DAO reales, JDBC y MySQL. Fuer
 | IT-04 | Ciclo de pedido | Integración | Cliente autenticado | Pedido marcado como prueba | Crear pedido y consultar histórico | Pedido y líneas quedan guardados y visibles | Manual | Interfaz y consultas MySQL | Superada |
 | IT-05 | Alta de HORECA | Integración | Maestro autenticado | Correo, documento y empresa de prueba | Crear HORECA e iniciar sesión con la nueva cuenta | Usuario, cliente HORECA y acceso quedan relacionados correctamente | Manual | Interfaz y consultas MySQL | Superada |
 | IT-06 | Limpieza | Integración | IT-03, IT-04 e IT-05 completadas | Identificadores temporales | Eliminar en orden los datos de prueba y consultar recuentos | No queda ningún registro ni sesión temporal | Manual | Consultas con resultado `0` y sesiones vacías | Superada |
+| IT-07 | Reserva vinculada al perfil maestro | Integración | Aplicación iniciada y cuenta comercial asociada a `MAESTRODEMO01` | `comercial@lineacano.com`, reserva temporal para 2 huéspedes | Iniciar sesión como maestro, consultar disponibilidad, crear la reserva, comprobar su persistencia, limpiar la reserva y cerrar sesión | La reserva queda vinculada a `MAESTRODEMO01`, se asocia a una habitación y tanto la reserva temporal como el token se eliminan al finalizar | Manual | Respuestas HTTP y consultas MySQL de asociación, persistencia y limpieza | Superada |
+
+### 4.1. Registro de IT-07 — Reserva vinculada al perfil maestro
+
+- **Datos utilizados:** cuenta `comercial@lineacano.com`, rol `maestro`, cliente asociado `MAESTRODEMO01` y reserva temporal número `21`.
+- **Pasos realizados:** se inició sesión con la cuenta comercial, se consultó la disponibilidad para dos huéspedes, se confirmó una reserva desde el perfil maestro, se comprobó su persistencia en MySQL y después se eliminó la reserva temporal. Finalmente se cerró la sesión.
+- **Resultado esperado:** acceso correcto con rol maestro, reserva creada con HTTP 201 y vinculada a `MAESTRODEMO01`, relación con una habitación, limpieza completa de la reserva y eliminación del token de `sesion_acceso`.
+- **Resultado obtenido:** el inicio de sesión devolvió el rol `maestro` y el documento `MAESTRODEMO01`; la consulta de disponibilidad fue correcta; la reserva `21` se creó con HTTP 201, estado `Confirmada`, habitación `101` e importe de `300 €`. La reserva y su relación con la habitación se localizaron en MySQL. Después de la limpieza no quedó la reserva temporal y, tras cerrar sesión, no quedó el token utilizado en `sesion_acceso`.
+- **Evidencia:** respuesta JSON del inicio de sesión y de la consulta de disponibilidad, respuesta HTTP 201 de creación, consultas sobre `reserva`, `reserva_habitacion` y `sesion_acceso`, y recuentos finales con resultado `0` para la reserva temporal y el token.
+- **Estado final:** superada.
 
 ## 5. Pruebas funcionales de la aplicación
 
@@ -118,7 +128,7 @@ Los casos PN-08 y PN-09 se conservan como pruebas manuales porque dependen del r
 
 Las pruebas JUnit no generan datos reales. En las pruebas manuales debe anotarse cada identificador creado y eliminarse respetando las relaciones entre tablas. Después se comprueba con consultas `COUNT(*)` que quedan cero reservas, pedidos, usuarios, clientes HORECA y sesiones asociados a los datos temporales.
 
-En la prueba de integración ya realizada se eliminaron la reserva, el pedido, el usuario HORECA, el cliente asociado y sus sesiones. Todos los recuentos finales fueron cero.
+En las pruebas de integración se eliminaron la reserva, el pedido, el usuario HORECA, el cliente asociado y sus sesiones temporales. Todos los recuentos finales fueron cero. En IT-07 también se eliminó la reserva temporal `21` y se comprobó que el token utilizado por el maestro ya no existía en `sesion_acceso`. El cliente de demostración `MAESTRODEMO01` se conserva porque forma parte de los datos permanentes de la aplicación.
 
 Tras FT-07 también se eliminaron el usuario y el cliente temporal `prueba.m06.eliminar@lineacano.test`. Las consultas finales sobre `usuario_acceso`, `cliente` y `sesion_acceso` devolvieron `restantes = 0` en los tres casos.
 
