@@ -69,7 +69,8 @@ CREATE TABLE IF NOT EXISTS `pedido_producto_linea` (
 
 INSERT INTO `cliente` (`id_dni`, `nombre`, `apellido1`, `apellido2`, `correo`, `telefono`, `direccion`, `fecha_nacimiento`)
 VALUES
-  ('H1234567A', 'Laura', 'Horeca', NULL, 'horeca@lineacano.com', '+34 600 000 100', NULL, NULL)
+  ('H1234567A', 'Laura', 'Horeca', NULL, 'horeca@lineacano.com', '+34 600 000 100', NULL, NULL),
+  ('MAESTRODEMO01', 'Equipo', 'Comercial', NULL, 'comercial@lineacano.com', NULL, NULL, NULL)
 ON DUPLICATE KEY UPDATE
   `nombre` = VALUES(`nombre`),
   `apellido1` = VALUES(`apellido1`),
@@ -80,7 +81,7 @@ INSERT INTO `usuario_acceso` (`correo`, `contrasena_hash`, `rol`, `activo`, `id_
 VALUES
   ('cliente@lineacano.com', SHA2('cliente123', 256), 'registrado', 1, '11111111A'),
   ('horeca@lineacano.com', SHA2('horeca123', 256), 'horeca', 1, 'H1234567A'),
-  ('comercial@lineacano.com', SHA2('master123', 256), 'maestro', 1, NULL)
+  ('comercial@lineacano.com', SHA2('master123', 256), 'maestro', 1, 'MAESTRODEMO01')
 ON DUPLICATE KEY UPDATE
   `contrasena_hash` = VALUES(`contrasena_hash`),
   `rol` = VALUES(`rol`),
