@@ -1,6 +1,7 @@
 package com.lineacano.servidor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,10 +33,25 @@ class ServicioPedidosTest {
                 () -> servicio.crearPedido("11111111A", "registrado", "desconocido:2"));
     }
 
+    @Test
+    void rechazaPedidoConCantidadInvalida() {
+        PedidoDaoPrueba dao = new PedidoDaoPrueba();
+        ServicioPedidos servicio = new ServicioPedidos(dao);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.crearPedido("11111111A", "registrado", "iberico:0"));
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.crearPedido("11111111A", "registrado", "iberico:-1"));
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.crearPedido("11111111A", "registrado", "iberico:texto"));
+        assertFalse(dao.crearPedidoInvocada);
+    }
+
     private static final class PedidoDaoPrueba extends PedidoDao {
         private String canal;
         private BigDecimal total;
         private List<LineaPedido> lineas = List.of();
+        private boolean crearPedidoInvocada;
 
         private PedidoDaoPrueba() {
             super(null);
@@ -43,6 +59,7 @@ class ServicioPedidosTest {
 
         @Override
         public int crearPedido(String idDni, String canal, BigDecimal total, List<LineaPedido> lineas) {
+            crearPedidoInvocada = true;
             this.canal = canal;
             this.total = total;
             this.lineas = lineas;

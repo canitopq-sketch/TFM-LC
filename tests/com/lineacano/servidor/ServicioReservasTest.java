@@ -1,5 +1,6 @@
 package com.lineacano.servidor;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,9 +43,30 @@ class ServicioReservasTest {
         ));
     }
 
+    @Test
+    void rechazaCancelacionPasadaOYaCancelada() {
+        ReservaDaoPrueba dao = new ReservaDaoPrueba();
+        ServicioReservas servicio = new ServicioReservas(dao);
+
+        dao.estadoReserva = Optional.of(new EstadoReserva(
+                50, LocalDate.now().minusDays(1), "Confirmada"
+        ));
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.cancelarReserva(50, "11111111A"));
+
+        dao.estadoReserva = Optional.of(new EstadoReserva(
+                51, LocalDate.now().plusDays(10), "Cancelada"
+        ));
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.cancelarReserva(51, "11111111A"));
+        assertFalse(dao.cancelarReservaInvocada);
+    }
+
     private static final class ReservaDaoPrueba extends ReservaDao {
         private List<HabitacionLibre> habitaciones = List.of(new HabitacionLibre(7, 90.0));
         private boolean crearReservaInvocada;
+        private Optional<EstadoReserva> estadoReserva = Optional.empty();
+        private boolean cancelarReservaInvocada;
 
         private ReservaDaoPrueba() {
             super(null);
@@ -63,7 +85,13 @@ class ServicioReservasTest {
 
         @Override
         public Optional<EstadoReserva> buscarReservaCliente(int idReserva, String idDni) {
-            return Optional.empty();
+            return estadoReserva;
+        }
+
+        @Override
+        public boolean cancelarReserva(int idReserva, String idDni) {
+            cancelarReservaInvocada = true;
+            return true;
         }
     }
 }

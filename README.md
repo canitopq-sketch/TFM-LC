@@ -115,9 +115,11 @@ mvn clean test
 El resultado esperado es:
 
 ```text
-Tests run: 15, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 20, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
+
+El detalle de los casos unitarios, de integración, funcionales y de permisos se encuentra en [PLAN_PRUEBAS.md](PLAN_PRUEBAS.md).
 
 ## 6. Generar JavaDoc
 
